@@ -10,9 +10,9 @@ use std::{env, fs};
 #[command(version, about, long_about = None)]
 struct Args {
     // TODO: Allow users to choose language models
-    /// Specify your preferred language model
-    #[arg(short, long)]
-    model: Option<String>,
+    // /// Specify your preferred language model
+    // #[arg(short, long)]
+    // model: Option<String>,
 
     /// Path to a file containing words to link together - the words from your team
     to_link: PathBuf,
@@ -82,7 +82,7 @@ fn build_request_body(prompt: String) -> serde_json::Value {
     })
 }
 
-async fn get_answer_from_api_endpoint(
+async fn get_message_from_api_endpoint(
     endpoint: String,
     key: String,
     body: serde_json::Value,
@@ -112,11 +112,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // API
     dotenv().ok();
-    let api_key = env::var("GROQ_API_KEY")?;
-    let endpoint = env::var("GROQ_API_ENDPOINT")?;
+    let api_key = env::var("API_KEY")?;
+    let mut base_url = env::var("OPENAI_API_BASE_URL")?;
+    if !base_url.ends_with('/') { base_url.push('/'); }
 
+    let chat_completion_endpoint = base_url + "v1/chat/completions";
     let body = build_request_body(prompt);
-    let answer = get_answer_from_api_endpoint(endpoint, api_key, body).await?;
+    let answer = get_message_from_api_endpoint(chat_completion_endpoint, api_key, body).await?;
 
     println!("{}", answer);
     Ok(())
