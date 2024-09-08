@@ -6,35 +6,41 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// FILE should contain a list of words to link together - the words from your team
+    /// A list of words to link together - the words from your team
     #[arg(short, long, required = true, value_name = "FILE")]
     link: PathBuf,
 
-    /// FILE should contain a list of words to avoid - opponent's words, neutral words, and the assassin word
+    /// A list of words to avoid - opponent's words, neutral words, and the assassin word
     #[arg(short, long, required = true, value_name = "FILE")]
     avoid: PathBuf,
 }
 
 fn main() {
     let args = Args::parse();
-    
-    let link_words: Vec<String>;
-    let avoid_words: Vec<String>;
 
-    // If the attempt to read both files succeeds, collect each line of the files into their corresponding vector
-    if let (Ok(link_lines), Ok(avoid_lines)) = (fs::read_to_string(args.link), fs::read_to_string(args.avoid)) {
-        link_words = link_lines
+    // Read and parse the link words file
+    let link_words = match fs::read_to_string(&args.link) {
+        Ok(link_lines) => link_lines
             .lines()
             .map(|line| line.trim().to_string())
-            .collect();
-        avoid_words = avoid_lines
+            .collect::<Vec<String>>(),
+        Err(_) => {
+            eprintln!("Failed to read link words file: {:?}", args.link);
+            std::process::exit(1);
+        }
+    };
+
+    // Read and parse the avoid words file
+    let avoid_words = match fs::read_to_string(&args.avoid) {
+        Ok(avoid_lines) => avoid_lines
             .lines()
             .map(|line| line.trim().to_string())
-            .collect();
-    } else {
-        eprintln!("Failed to read file(s): Make sure your input path is correct.");
-        std::process::exit(1);
-    }
+            .collect::<Vec<String>>(),
+        Err(_) => {
+            eprintln!("Failed to read avoid words file: {:?}", args.avoid);
+            std::process::exit(1);
+        }
+    };
 
 
     // Testing
