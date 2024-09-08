@@ -44,17 +44,13 @@ fn main() {
             std::process::exit(1);
         }
     };
-
-
+    
     // Constructing prompt
-    let mut prompt = String::from("To Link:\n");
-    for word in link_words {
-        prompt.push_str(&format!("{}\n", word));
-    }
-    prompt.push_str("\nTo Avoid:\n");
-    for word in avoid_words {
-        prompt.push_str(&format!("{}\n", word));
-    }
+    let prompt = format!(
+        "To Link:\n{}\n\nTo Avoid:\n{}",
+        link_words.join("\n"),
+        avoid_words.join("\n")
+    );
 
     // Testing
     eprintln!("{}", prompt);
