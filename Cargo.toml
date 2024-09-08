@@ -3,3 +3,6 @@ name = "mastermind"
 version = "0.1.0"
 edition = "2021"
 authors = ["theoforger <theoforger@proton.me>"]
+
+[dependencies]
+clap = { version = "4.5.17", features = ["derive"] }
