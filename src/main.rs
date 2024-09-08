@@ -18,40 +18,36 @@ struct Args {
     to_avoid: PathBuf,
 }
 
-fn main() {
-    let args = Args::parse();
-
-    // Read and parse the link words file
-    let link_words = match fs::read_to_string(&args.to_link) {
-        Ok(link_lines) => link_lines
+fn read_words_from_file(path: PathBuf) -> Vec<String> {
+    match fs::read_to_string(&path) {
+        Ok(contents) => contents
             .lines()
             .map(|line| line.trim().to_string())
+            .filter(|line| !line.is_empty())
             .collect::<Vec<String>>(),
-        Err(_) => {
-            eprintln!("Failed to read link words file: {:?}", args.to_link);
+        Err(e) => {
+            eprintln!("Failed to read file at {:?}: {}", path, e);
             std::process::exit(1);
         }
-    };
+    }
+}
 
-    // Read and parse the avoid words file
-    let avoid_words = match fs::read_to_string(&args.to_avoid) {
-        Ok(avoid_lines) => avoid_lines
-            .lines()
-            .map(|line| line.trim().to_string())
-            .collect::<Vec<String>>(),
-        Err(_) => {
-            eprintln!("Failed to read avoid words file: {:?}", args.to_avoid);
-            std::process::exit(1);
-        }
-    };
-    
-    // Constructing prompt
-    let prompt = format!(
+fn generate_prompt(link_words: Vec<String>, avoid_words: Vec<String>) -> String {
+    format!(
         "To Link:\n{}\n\nTo Avoid:\n{}",
         link_words.join("\n"),
         avoid_words.join("\n")
-    );
+    )
+}
+
+fn main() {
+    let args = Args::parse();
+
+    let link_words = read_words_from_file(args.to_link);
+    let avoid_words = read_words_from_file(args.to_avoid);
+
+    let prompt = generate_prompt(link_words, avoid_words);
 
     // Testing
-    eprintln!("{}", prompt);
+    println!("{}", prompt);
 }
