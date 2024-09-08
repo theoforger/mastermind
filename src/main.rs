@@ -48,15 +48,13 @@ fn main() {
 
     // Constructing prompt
     let mut prompt = String::from("To Link:\n");
-    link_words.iter().for_each(|word| {
-        prompt.push_str(&word);
-        prompt.push_str("\n");
-    });
+    for word in link_words {
+        prompt.push_str(&format!("{}\n", word));
+    }
     prompt.push_str("\nTo Avoid:\n");
-    avoid_words.iter().for_each(|word| {
-        prompt.push_str(&word);
-        prompt.push_str("\n");
-    });
+    for word in avoid_words {
+        prompt.push_str(&format!("{}\n", word));
+    }
 
     // Testing
     eprintln!("{}", prompt);
