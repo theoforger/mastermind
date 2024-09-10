@@ -1,18 +1,18 @@
-use std::{env, fs};
-use std::path::PathBuf;
 use clap::Parser;
 use dotenv::dotenv;
-use serde_json::json;
 use serde::Deserialize;
+use serde_json::json;
+use std::path::PathBuf;
+use std::{env, fs};
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
     // TODO: Allow users to choose language models
-    // /// A list of words to avoid - opponent's words, neutral words, and the assassin word
-    // #[arg(short, long)]
-    // model: Option<String>,
+    /// Specify your preferred language model
+    #[arg(short, long)]
+    model: Option<String>,
 
     /// Path to a file containing words to link together - the words from your team
     to_link: PathBuf,
@@ -59,18 +59,19 @@ fn generate_prompt(link_words: Vec<String>, avoid_words: Vec<String>) -> String 
 }
 
 fn build_request_body(prompt: String) -> serde_json::Value {
-    json!({
-        "messages": [
-            {
-                "role": "system",
-                "content": "I am the spymaster in Codenames. I will give you a list of agent words to link together, followed by a list of agent words to avoid. Give me a list of clue words followed by the agent words they are supposed to link together. With each clue word, try to link as many agent words as possible
+    let system_prompt = "I am the spymaster in Codenames. I will give you a list of agent words to link together, followed by a list of agent words to avoid. Give me a list of clue words followed by the agent words they are supposed to link together. With each clue word, try to link as many agent words as possible
                     Here are the requirements:
                     - Always answer in lower case
                     - Give five clue word options
                     - Never give any intro, outro or explanation
                     - Answer in this format:
                         [clue] [number of agent words] - [agent word] [agent word] [agent word]
-                    - For the agent words, only give the words themselves. Do not add anything."
+                    - For the agent words, only give the words themselves. Do not add anything.";
+    json!({
+        "messages": [
+            {
+                "role": "system",
+                "content": system_prompt,
             },
             {
                 "role": "user",
@@ -81,22 +82,23 @@ fn build_request_body(prompt: String) -> serde_json::Value {
     })
 }
 
-async fn get_answer_from_api_endpoint(endpoint: String, key: String, body: serde_json::Value) -> reqwest::Result<String> {
+async fn get_answer_from_api_endpoint(
+    endpoint: String,
+    key: String,
+    body: serde_json::Value,
+) -> reqwest::Result<String> {
     let client = reqwest::Client::new();
     let response = client
         .post(endpoint)
         .bearer_auth(key)
         .json(&body)
-        .send().await?;
+        .send()
+        .await?;
 
-    Ok(response
-        .json::<GorqResponse>()
-        .await?
-        .choices[0]
+    Ok(response.json::<GorqResponse>().await?.choices[0]
         .message
         .content
-        .to_owned()
-    )
+        .to_owned())
 }
 
 #[tokio::main]
@@ -112,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     let api_key = env::var("GROQ_API_KEY")?;
     let endpoint = env::var("GROQ_API_ENDPOINT")?;
-    
+
     let body = build_request_body(prompt);
     let answer = get_answer_from_api_endpoint(endpoint, api_key, body).await?;
 
