@@ -1,39 +1,33 @@
 use clap::Parser;
 use dotenv::dotenv;
-use serde::Deserialize;
 use serde_json::json;
 use std::path::PathBuf;
 use std::{env, fs};
+
+mod json_models;
+use json_models::chat_completion::*;
+use json_models::language_models::*;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
-    // TODO: Allow users to choose language models
-    // /// Specify your preferred language model
-    // #[arg(short, long)]
-    // model: Option<String>,
+    // TODO
+    /// Specify a language model
+    #[arg(short, long)]
+    model: Option<String>,
+
+    /// Get all available language json_models from API
+    #[arg(short, long)]
+    get: bool,
 
     /// Path to a file containing words to link together - the words from your team
-    to_link: PathBuf,
+    #[arg(required_unless_present = "get")]
+    to_link: Option<PathBuf>,
 
     /// Path to a file containing words to avoid - opponent's words, neutral words, and the assassin word
-    to_avoid: PathBuf,
-}
-
-#[derive(Deserialize)]
-struct GorqResponse {
-    choices: Vec<Choice>,
-}
-
-#[derive(Deserialize)]
-struct Choice {
-    message: Message,
-}
-
-#[derive(Deserialize)]
-struct Message {
-    content: String,
+    #[arg(required_unless_present = "get")]
+    to_avoid: Option<PathBuf>,
 }
 
 fn read_words_from_file(path: PathBuf) -> Vec<String> {
@@ -82,9 +76,9 @@ fn build_request_body(prompt: String) -> serde_json::Value {
     })
 }
 
-async fn get_message_from_api_endpoint(
+async fn get_clues_from_api(
     endpoint: String,
-    key: String,
+    key: &str,
     body: serde_json::Value,
 ) -> reqwest::Result<String> {
     let client = reqwest::Client::new();
@@ -95,31 +89,59 @@ async fn get_message_from_api_endpoint(
         .send()
         .await?;
 
-    Ok(response.json::<GorqResponse>().await?.choices[0]
+    Ok(response.json::<ChatCompletionResponse>().await?.choices[0]
         .message
         .content
         .to_owned())
 }
 
+async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<String> {
+    let client = reqwest::Client::new();
+    let response = client.get(endpoint).bearer_auth(key).send().await?;
+
+    Ok(response
+        .json::<ModelsResponse>()
+        .await?
+        .data
+        .iter()
+        .map(|model| model.id.as_str())
+        .collect::<Vec<&str>>()
+        .join("\n"))
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Read arguments
     let args = Args::parse();
 
-    let link_words = read_words_from_file(args.to_link);
-    let avoid_words = read_words_from_file(args.to_avoid);
-
-    let prompt = generate_prompt(link_words, avoid_words);
-
-    // API
+    // API Configuration
     dotenv().ok();
     let api_key = env::var("API_KEY")?;
     let mut base_url = env::var("OPENAI_API_BASE_URL")?;
-    if !base_url.ends_with('/') { base_url.push('/'); }
+    if !base_url.ends_with('/') {
+        base_url.push('/');
+    }
 
-    let chat_completion_endpoint = base_url + "chat/completions";
+    // if -g is set, call the json_models API instead
+    if args.get {
+        let models_endpoint = format!("{}models", base_url);
+        println!(
+            "{}",
+            get_model_ids_from_api(models_endpoint, &api_key).await?
+        );
+        return Ok(());
+    }
+
+    // Get the prompt ready
+    let link_words = read_words_from_file(args.to_link.unwrap());
+    let avoid_words = read_words_from_file(args.to_avoid.unwrap());
+    let prompt = generate_prompt(link_words, avoid_words);
+
+    // Call the chat completion API
+    let chat_completion_endpoint = format!("{}chat/completions", base_url);
     let body = build_request_body(prompt);
-    let answer = get_message_from_api_endpoint(chat_completion_endpoint, api_key, body).await?;
+    let clues = get_clues_from_api(chat_completion_endpoint, &api_key, body).await?;
 
-    println!("{}", answer);
+    println!("{}", clues);
     Ok(())
 }
