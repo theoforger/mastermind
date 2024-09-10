@@ -116,7 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut base_url = env::var("OPENAI_API_BASE_URL")?;
     if !base_url.ends_with('/') { base_url.push('/'); }
 
-    let chat_completion_endpoint = base_url + "v1/chat/completions";
+    let chat_completion_endpoint = base_url + "chat/completions";
     let body = build_request_body(prompt);
     let answer = get_message_from_api_endpoint(chat_completion_endpoint, api_key, body).await?;
 
