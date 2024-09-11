@@ -52,14 +52,14 @@ fn generate_prompt(link_words: Vec<String>, avoid_words: Vec<String>) -> String 
     )
 }
 
-fn build_request_body(prompt: String) -> serde_json::Value {
+fn build_request_body(prompt: String, model_id: String) -> serde_json::Value {
     let system_prompt = "You are the spymaster in Codenames.
                     I will give you a list of words to link together, followed by a list of words to avoid.
                     Respond with a list of clue words followed by the words they are supposed to link together.
                     With each clue word, try to link as many words as possible.
                     Here are the requirements:
                     - Always answer in lower case
-                    - Give five clue word options
+                    - Give 5 to 10 clue word options
                     - Never give any intro, outro or explanation
                     - Only give the words themselves. Do not add anything else
                     - Answer in this format:
@@ -76,7 +76,7 @@ fn build_request_body(prompt: String) -> serde_json::Value {
                 "content": prompt
             }
         ],
-        "model": "llama-3.1-70b-versatile"
+        "model": model_id
     })
 }
 
@@ -93,32 +93,39 @@ async fn get_clues_from_api(
         .send()
         .await?;
 
-    Ok(response.json::<ChatCompletionResponse>().await?.choices[0]
+    let mut clues = response.json::<ChatCompletionResponse>().await?.choices[0]
         .message
         .content
         .lines()
         .map(|line| line.trim().to_string())
-        .collect::<Vec<String>>())
+        .collect::<Vec<String>>();
+
+    cleanup_clues(&mut clues);
+
+    Ok(clues)
 }
 
 async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<Vec<String>> {
     let client = reqwest::Client::new();
     let response = client.get(endpoint).bearer_auth(key).send().await?;
 
-    Ok(response
+    let mut model_ids = response
         .json::<ModelsResponse>()
         .await?
         .data
         .iter()
         .map(|model| model.id.trim().to_string())
-        .collect::<Vec<String>>())
+        .collect::<Vec<String>>();
+    model_ids.sort();
+
+    Ok(model_ids)
 }
 
 // Remove possible LLM hallucination
 fn cleanup_clues(clues: &mut Vec<String>) {
     clues.retain(|clue| {
-        let words: Vec<&str> = clue.split(' ').collect();
-        if words.len() > 3 {
+        let words: Vec<&str> = clue.split_whitespace().collect();
+        if words.len() > 4 {
             if let Ok(count) = words[1].parse::<usize>() {
                 if words.len() == count + 3 {
                     return true;
@@ -128,22 +135,28 @@ fn cleanup_clues(clues: &mut Vec<String>) {
 
         false
     });
+
+    clues.sort_by(|a, b| {
+        let a_words: Vec<&str> = a.split_whitespace().collect();
+        let b_words: Vec<&str> = b.split_whitespace().collect();
+        b_words[1].cmp(&a_words[1])
+    });
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Read arguments
+    // Read arguments and environment variables
     let args = Args::parse();
+    dotenv().ok();
 
     // API Setup
-    dotenv().ok();
     let api_key = env::var("API_KEY")?;
     let mut base_url = env::var("OPENAI_API_BASE_URL")?;
     if !base_url.ends_with('/') {
         base_url.push('/');
     }
 
-    // if -g is set, call the models API instead
+    // If -g is set, call the models API endpoint instead
     if args.get {
         let models_endpoint = format!("{}models", base_url);
         let output = get_model_ids_from_api(models_endpoint, &api_key)
@@ -153,20 +166,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // Get the prompt ready
+    // If -m is set, use a preferred language model. Otherwise, use the default
+    let model_id = if args.model.is_some() {
+        args.model.unwrap()
+    } else {
+        env::var("DEFAULT_MODEL_ID")?
+    };
+
+    // Ready the prompt
     let link_words = read_words_from_file(args.to_link.unwrap());
     let avoid_words = read_words_from_file(args.to_avoid.unwrap());
     let prompt = generate_prompt(link_words, avoid_words);
 
-    // Call the chat completion API
+    // Call the chat completion API endpoint
     let chat_completion_endpoint = format!("{}chat/completions", base_url);
-    let body = build_request_body(prompt);
-    let mut clues = get_clues_from_api(chat_completion_endpoint, &api_key, body).await?;
+    let body = build_request_body(prompt, model_id);
+    let clues = get_clues_from_api(chat_completion_endpoint, &api_key, body).await?;
 
-    cleanup_clues(&mut clues);
-
-    let output = clues.join("\n");
-    println!("{}", output);
+    if clues.is_empty() {
+        println!("The language model didn't return any useful clues.");
+    } else {
+        let output = clues.join("\n");
+        println!("{}", output);
+    }
 
     Ok(())
 }
