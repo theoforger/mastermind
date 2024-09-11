@@ -80,7 +80,7 @@ async fn get_clues_from_api(
     endpoint: String,
     key: &str,
     body: serde_json::Value,
-) -> reqwest::Result<String> {
+) -> reqwest::Result<Vec<String>> {
     let client = reqwest::Client::new();
     let response = client
         .post(endpoint)
@@ -92,10 +92,12 @@ async fn get_clues_from_api(
     Ok(response.json::<ChatCompletionResponse>().await?.choices[0]
         .message
         .content
-        .to_owned())
+        .lines()
+        .map(|line| line.trim().to_string())
+        .collect::<Vec<String>>())
 }
 
-async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<String> {
+async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<Vec<String>> {
     let client = reqwest::Client::new();
     let response = client.get(endpoint).bearer_auth(key).send().await?;
 
@@ -104,9 +106,24 @@ async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<
         .await?
         .data
         .iter()
-        .map(|model| model.id.as_str())
-        .collect::<Vec<&str>>()
-        .join("\n"))
+        .map(|model| model.id.trim().to_string())
+        .collect::<Vec<String>>())
+}
+
+// Remove possible LLM hallucination
+fn cleanup_clues(clues: &mut Vec<String>) {
+    clues.retain(|clue| {
+        let words: Vec<&str> = clue.split(' ').collect();
+        if words.len() > 3 {
+            if let Ok(count) = words[1].parse::<usize>() {
+                if words.len() == count + 3 {
+                    return true;
+                }
+            }
+        }
+
+        false
+    });
 }
 
 #[tokio::main]
@@ -125,10 +142,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // if -g is set, call the json_models API instead
     if args.get {
         let models_endpoint = format!("{}models", base_url);
-        println!(
-            "{}",
-            get_model_ids_from_api(models_endpoint, &api_key).await?
-        );
+        let output = get_model_ids_from_api(models_endpoint, &api_key)
+            .await?
+            .join("\n");
+        println!("{}", output);
         return Ok(());
     }
 
@@ -140,8 +157,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Call the chat completion API
     let chat_completion_endpoint = format!("{}chat/completions", base_url);
     let body = build_request_body(prompt);
-    let clues = get_clues_from_api(chat_completion_endpoint, &api_key, body).await?;
+    let mut clues = get_clues_from_api(chat_completion_endpoint, &api_key, body).await?;
 
-    println!("{}", clues);
+    cleanup_clues(&mut clues);
+
+    let output = clues.join("\n");
+    println!("{}", output);
+
     Ok(())
 }
