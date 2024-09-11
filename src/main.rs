@@ -57,12 +57,15 @@ fn build_request_body(prompt: String, model_id: String) -> serde_json::Value {
                     Respond with a list of clue words followed by the words they are supposed to link together.
                     With each clue word, try to link as many words as possible.
                     Here are the requirements:
-                    - Always answer in lower case
-                    - Give 5 to 10 clue word options
-                    - Never give any intro, outro or explanation
-                    - Only give the words themselves. Do not add anything else
+                    - Always answer in lower case.
+                    - Give 5 to 10 clue word options.
+                    - Do not give repeated clue words.
+                    - Never give any intro, outro or explanation.
+                    - Only give the words themselves. Do not add anything else.
                     - Answer in this format:
                         [clue] [number of agent words] - [agent word] [agent word] [agent word]
+                        [clue] [number of agent words] - [agent word] [agent word] [agent word]
+                        ...
                     ";
     json!({
         "messages": [
