@@ -5,6 +5,8 @@ choice. Written in Rust because why not?
 
 ![GitHub License](https://img.shields.io/github/license/theoforger/mastermind)
 
+<img src="demo.gif" width="600"/>
+
 ## Usage
 
 You need to prepare two text files.
