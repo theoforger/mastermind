@@ -16,7 +16,6 @@ struct Args {
     #[arg(short, long = "get-models")]
     get: bool,
 
-    // TODO
     /// Specify a language model
     #[arg(short, long = "set-model")]
     model: Option<String>,
@@ -85,7 +84,10 @@ async fn get_clues_from_api(
     key: &str,
     body: serde_json::Value,
 ) -> reqwest::Result<Vec<String>> {
+    // Create a new client
     let client = reqwest::Client::new();
+
+    // Get response from API endpoint
     let response = client
         .post(endpoint)
         .bearer_auth(key)
@@ -93,6 +95,7 @@ async fn get_clues_from_api(
         .send()
         .await?;
 
+    // Deserialize the response
     let mut clues = response.json::<ChatCompletionResponse>().await?.choices[0]
         .message
         .content
@@ -100,7 +103,8 @@ async fn get_clues_from_api(
         .map(|line| line.trim().to_string())
         .collect::<Vec<String>>();
 
-    cleanup_clues(&mut clues);
+    // Clean up
+    clean_up_clues(&mut clues);
 
     Ok(clues)
 }
@@ -121,8 +125,9 @@ async fn get_model_ids_from_api(endpoint: String, key: &str) -> reqwest::Result<
     Ok(model_ids)
 }
 
-// Remove possible LLM hallucination
-fn cleanup_clues(clues: &mut Vec<String>) {
+/// Remove invalid clues and sort the clues by the number of words they link together
+fn clean_up_clues(clues: &mut Vec<String>) {
+    // Remove LLM hallucination and clues that only link one word
     clues.retain(|clue| {
         let words: Vec<&str> = clue.split_whitespace().collect();
         if words.len() > 4 {
@@ -132,10 +137,10 @@ fn cleanup_clues(clues: &mut Vec<String>) {
                 }
             }
         }
-
         false
     });
 
+    // Sort the clues by the number of words they link together
     clues.sort_by(|a, b| {
         let a_words: Vec<&str> = a.split_whitespace().collect();
         let b_words: Vec<&str> = b.split_whitespace().collect();
