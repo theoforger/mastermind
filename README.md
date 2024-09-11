@@ -1,26 +1,24 @@
-# Mastermind - A Second Brain for Spymasters
+# 🔮 Mastermind - A Second Brain for Spymasters
 
-Mastermind is a CLI tool that generates clue words for spymasters in the game of **Codenames**. Powered by LLMs of your
-choice. Written in Rust because why not?
+Mastermind is a CLI tool designed to generate clue words for spymasters in the game of **Codenames**. It leverages language models of your choice and is written in Rust, because why not?
 
 ![GitHub License](https://img.shields.io/github/license/theoforger/mastermind)
 
-<img src="demo.gif" width="600"/>
+<img src="demo.gif" width="75%" alt="A gif demo of the basic functions of this program."/>
 
-## Usage
+## 💻 Usage
 
-You need to prepare two text files.
+To get started, prepare two text files:
 
-1. **Words to Link Together**: This file contains the words from your own team.
-2. **Words to Avoid**: This file contains:
+1. **Words to Link Together**: Contains the words from your own team.
+2. **Words to Avoid**: Contains:
+    - Your opponent's words
+    - Neutral words
+    - The assassin word
 
-- Your opponent's words
-- Neutral words
-- The assassin word
+Each file should have one word per line. Refer to the [examples](examples) directory for sample files.
 
-Each file should contain one word per line. See the [examples](examples) directory for sample files.
-
-To use the tool, run:
+Run the tool with:
 
 ```bash
 mastermind [TO_LINK] [TO_AVOID]
@@ -30,20 +28,19 @@ Feel free to run the program multiple times to get the best result!
 
 ### Options
 
-- `-g` or `--get-models` : Get all available language models.
-- `-m` or `--set-model` : Choose a language model.
-- `-V` or `--version` : Display the version number.
-- `-h` or `--help` : Display help information.
+- `-g`, `--get-models` : List all available language models.
+- `-m`, `--set-model` : Select a language model.
+- `-V`, `--version` : Show the version number.
+- `-h`, `--help` : Display help information.
 
-## Building
+## 🛠️ Building
 
 ### Prerequisites
 
 - `rust`
 - `cargo`
 
-Using [`rustup`](https://www.rust-lang.org/tools/install) will install them both. Alternatively, you can install them
-from your package manager. Keep in mind that some distros package them separately.
+Install them using [`rustup`](https://www.rust-lang.org/tools/install), or through your package manager (note: some distributions may package them separately).
 
 ### Clone the Repository
 
@@ -54,13 +51,13 @@ cd mastermind
 
 ### Configure Environment Variables
 
-Edit the [example.env](example.env) file to include or modify:
+Edit the [example.env](example.env) file to add or modify:
 
 - Your API key
-- The base URL of an OpenAI Compatible API
+- The base URL of an OpenAI-compatible API
 - A default language model
 
-Once you're done, rename it to `.env`:
+Rename the file to `.env`:
 
 ```bash
 mv example.env .env
@@ -68,7 +65,7 @@ mv example.env .env
 
 ### Build the Project
 
-Simply run:
+Run the following command:
 
 ```bash
 cargo build --release
