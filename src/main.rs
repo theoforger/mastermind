@@ -12,14 +12,14 @@ use json_models::language_models::*;
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
+    /// Get available language json_models from API
+    #[arg(short, long = "get-models")]
+    get: bool,
+
     // TODO
     /// Specify a language model
-    #[arg(short, long)]
+    #[arg(short, long = "set-model")]
     model: Option<String>,
-
-    /// Get all available language json_models from API
-    #[arg(short, long)]
-    get: bool,
 
     /// Path to a file containing words to link together - the words from your team
     #[arg(required_unless_present = "get")]
@@ -53,14 +53,18 @@ fn generate_prompt(link_words: Vec<String>, avoid_words: Vec<String>) -> String 
 }
 
 fn build_request_body(prompt: String) -> serde_json::Value {
-    let system_prompt = "I am the spymaster in Codenames. I will give you a list of agent words to link together, followed by a list of agent words to avoid. Give me a list of clue words followed by the agent words they are supposed to link together. With each clue word, try to link as many agent words as possible
+    let system_prompt = "You are the spymaster in Codenames.
+                    I will give you a list of words to link together, followed by a list of words to avoid.
+                    Respond with a list of clue words followed by the words they are supposed to link together.
+                    With each clue word, try to link as many words as possible.
                     Here are the requirements:
                     - Always answer in lower case
                     - Give five clue word options
                     - Never give any intro, outro or explanation
+                    - Only give the words themselves. Do not add anything else
                     - Answer in this format:
                         [clue] [number of agent words] - [agent word] [agent word] [agent word]
-                    - For the agent words, only give the words themselves. Do not add anything.";
+                    ";
     json!({
         "messages": [
             {
@@ -131,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read arguments
     let args = Args::parse();
 
-    // API Configuration
+    // API Setup
     dotenv().ok();
     let api_key = env::var("API_KEY")?;
     let mut base_url = env::var("OPENAI_API_BASE_URL")?;
@@ -139,7 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         base_url.push('/');
     }
 
-    // if -g is set, call the json_models API instead
+    // if -g is set, call the models API instead
     if args.get {
         let models_endpoint = format!("{}models", base_url);
         let output = get_model_ids_from_api(models_endpoint, &api_key)
