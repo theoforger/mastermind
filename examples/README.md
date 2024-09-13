@@ -5,4 +5,6 @@ This directory contains a pair of text files which you can use to test the progr
 ### Cargo
 From the project root directory, run:
 
-`cargo run -- examples/to-avoid.txt examples/to-link.txt`
+```bash
+cargo run -- examples/link.txt examples/avoid.txt
+```
