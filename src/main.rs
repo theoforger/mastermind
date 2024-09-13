@@ -1,7 +1,8 @@
-use clap::Parser;
-use dotenv::dotenv;
 use std::env;
 use std::path::PathBuf;
+
+use clap::Parser;
+use dotenv::dotenv;
 
 use mastermind::api_handlers::chat_completions::*;
 use mastermind::api_handlers::models::*;
@@ -34,19 +35,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     dotenv().ok();
 
-    // API Setup
-    let api_key = env::var("API_KEY")?;
-    let mut base_url = env::var("OPENAI_API_BASE_URL")?;
-    if !base_url.ends_with('/') {
-        base_url.push('/');
-    }
+    // Get all model IDs for future reference
+    let model_ids = get_model_ids_from_api().await?;
 
     // If -g is set, call the models API endpoint instead
     if args.get {
-        let output = get_model_ids_from_api(&base_url, &api_key)
-            .await?
-            .join("\n");
-        println!("{}", output);
+        println!("{}", model_ids.join("\n"));
         return Ok(());
     }
 
@@ -55,19 +49,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let model_id = if args.model.is_some() {
         args.model.unwrap()
     } else {
-        env::var("DEFAULT_MODEL_ID")?
+        match env::var("DEFAULT_MODEL_ID") {
+            Ok(id) => id,
+            _ => return Err("Could not read environment variable: OPENAI_API_BASE_URL. Use -m to specify a language model".into())
+        }
     };
 
-    // Ready the words
+    // Abort the program if the chosen model is not valid
+    if !model_ids.contains(&model_id) {
+        return Err(format!(
+            "{} is not a valid language model from your provider",
+            model_id
+        )
+        .into());
+    }
+
+    // Get clues from API
     let link_words = read_words_from_file(args.to_link.unwrap());
     let avoid_words = read_words_from_file(args.to_avoid.unwrap());
-
-    // Call the chat completion API endpoint
-    let request_body = build_request_body_for_clues(link_words, avoid_words, &model_id);
-    let clues = get_clues_from_api(&base_url, &api_key, request_body).await?;
+    let clues = get_clues_from_api(link_words, avoid_words, &model_id).await?;
 
     if clues.is_empty() {
-        println!("The language model didn't return any useful clues.");
+        println!("The language model didn't return any useful clues. Maybe try again?");
     } else {
         let output = clues.join("\n");
         println!("{}", output);
