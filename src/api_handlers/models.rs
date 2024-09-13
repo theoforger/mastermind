@@ -1,10 +1,13 @@
+use crate::api_handlers::api_instance::ApiInstance;
 use crate::json_models::language_models::ModelsResponse;
 
-pub async fn get_model_ids_from_api(base_url: &str, key: &str) -> reqwest::Result<Vec<String>> {
-    let client = reqwest::Client::new();
-    let response = client
-        .get(base_url.to_string() + "models")
-        .bearer_auth(key)
+pub async fn get_model_ids_from_api() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let api_instance = ApiInstance::new()?;
+
+    let response = api_instance
+        .client
+        .get(api_instance.base_url + "models")
+        .bearer_auth(api_instance.key)
         .send()
         .await?;
 

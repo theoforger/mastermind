@@ -1,3 +1,4 @@
+use crate::api_handlers::api_instance::ApiInstance;
 use crate::json_models::chat_completion::ChatCompletionResponse;
 use serde_json::json;
 
@@ -17,12 +18,31 @@ Here are the requirements:
     ...
 "#;
 
-fn generate_prompt(link_words: Vec<String>, avoid_words: Vec<String>) -> String {
-    format!(
+fn build_request_body_for_clues(
+    link_words: Vec<String>,
+    avoid_words: Vec<String>,
+    model_id: &str,
+) -> serde_json::Value {
+    // Aggregate two sets of words into one prompt
+    let content = format!(
         "To Link:\n{}\n\nTo Avoid:\n{}",
         link_words.join("\n"),
         avoid_words.join("\n")
-    )
+    );
+
+    json!({
+        "messages": [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT,
+            },
+            {
+                "role": "user",
+                "content": content
+            }
+        ],
+        "model": model_id
+    })
 }
 
 /// Remove invalid clues and sort the clues by the number of words they link together
@@ -48,39 +68,20 @@ fn clean_up_clues(clues: &mut Vec<String>) {
     });
 }
 
-pub fn build_request_body_for_clues(
+pub async fn get_clues_from_api(
     link_words: Vec<String>,
     avoid_words: Vec<String>,
     model_id: &str,
-) -> serde_json::Value {
-    json!({
-        "messages": [
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": generate_prompt(link_words, avoid_words),
-            }
-        ],
-        "model": model_id
-    })
-}
-
-pub async fn get_clues_from_api(
-    base_url: &str,
-    key: &str,
-    body: serde_json::Value,
-) -> reqwest::Result<Vec<String>> {
-    // Create a new client
-    let client = reqwest::Client::new();
+) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let api_instance = ApiInstance::new()?;
+    let request_body = build_request_body_for_clues(link_words, avoid_words, model_id);
 
     // Get response from API endpoint
-    let response = client
-        .post(base_url.to_string() + "chat/completions")
-        .bearer_auth(key)
-        .json(&body)
+    let response = api_instance
+        .client
+        .post(api_instance.base_url.to_string() + "chat/completions")
+        .bearer_auth(api_instance.key)
+        .json(&request_body)
         .send()
         .await?;
 
