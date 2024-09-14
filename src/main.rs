@@ -46,13 +46,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // If -m is set, use a preferred language model
     // Otherwise, use the default
-    let model_id = if args.model.is_some() {
-        args.model.unwrap()
+    let model_id = if let Some(id) = args.model {
+        id
     } else {
-        match env::var("DEFAULT_MODEL_ID") {
-            Ok(id) => id,
-            _ => return Err("Could not read environment variable: OPENAI_API_BASE_URL. Use -m to specify a language model".into())
-        }
+        env::var("DEFAULT_MODEL_ID").map_err(|_| {
+            "Could not read environment variable: DEFAULT_MODEL_ID. Use -m to specify a language model"
+        })?
     };
 
     // Abort the program if the chosen model is not valid
@@ -64,11 +63,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into());
     }
 
-    // Get clues from API
-    let link_words = read_words_from_file(args.to_link.unwrap());
-    let avoid_words = read_words_from_file(args.to_avoid.unwrap());
-    let clues = get_clues_from_api(link_words, avoid_words, &model_id).await?;
+    // Attempt to read words from the two files
+    let link_words = read_words_from_file(args.to_link.unwrap())
+        .map_err(|e| e.to_string())?;
+    let avoid_words = read_words_from_file(args.to_avoid.unwrap())
+        .map_err(|e| e.to_string())?;
 
+    // Get clues from API
+    let clues = get_clues_from_api(link_words, avoid_words, &model_id).await?;
+    
+    // Output
     if clues.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else {
