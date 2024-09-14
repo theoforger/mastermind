@@ -3,21 +3,21 @@ use super::json_models::chat_completion::ChatCompletionResponse;
 use crate::clue::ClueCollection;
 use serde_json::json;
 
-const SYSTEM_PROMPT: &str = r#"You are the spymaster in Codenames.
-I will give you a list of words to link together, followed by a list of words to avoid.
-Respond with a list of clue words followed by the words they are supposed to link together.
-With each clue word, try to link as many words as possible.
+const SYSTEM_PROMPT: &str = r#"
+You are the spymaster in Codenames.
+I will give you a list of [agent word], followed by a list of [avoid word].
+Try to link [agent word] together.
+Tro to avoid [avoid word].
+Answer in this format:
+    [clue word] [number of agent words] [agent word] [agent word] [agent word]
+    ...
 Here are the requirements:
 - Always answer in lower case.
 - No special characters.
-- Give 5 to 10 clue word options.
-- Do not give repeated clue words.
-- Never give any intro, outro or explanation.
-- Only give the words themselves. Do not add anything else.
-- Answer in this format:
-    [clue] [number of agent words] [agent word] [agent word] [agent word]
-    [clue] [number of agent words] [agent word] [agent word] [agent word]
-    ...
+- No intro or outro.
+- No explanations.
+- Give 5-10 [clue word].
+- Each [clue word] should link at least 2 [agent word].
 "#;
 
 fn build_request_body_for_clues(
