@@ -11,10 +11,8 @@ impl ApiInstance {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         dotenv().ok();
 
-        let base_url = match env::var("OPENAI_API_BASE_URL") {
-            Ok(base_url) => base_url,
-            _ => return Err("Could not read environment variable: OPENAI_API_BASE_URL".into()),
-        };
+        let base_url = env::var("OPENAI_API_BASE_URL")
+            .map_err(|_| "Cannot read environment variable: OPENAI_API_BASE_URL")?;
 
         let base_url = if !base_url.ends_with('/') {
             format!("{}/", base_url)
@@ -22,10 +20,8 @@ impl ApiInstance {
             base_url
         };
 
-        let key = match env::var("API_KEY") {
-            Ok(key) => key,
-            _ => return Err("Could not read environment variable: API_KEY".into()),
-        };
+        let key = env::var("API_KEY")
+            .map_err(|_| "Cannot read environment variable: API_KEY")?;
 
         Ok(Self {
             client: reqwest::Client::new(),
