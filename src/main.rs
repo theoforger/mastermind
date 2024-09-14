@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use clap::Parser;
 use dotenv::dotenv;
 
-use mastermind::api_handlers::chat_completions::*;
-use mastermind::api_handlers::models::*;
+use api_handlers::chat_completions::*;
+use api_handlers::language_models::*;
 use mastermind::*;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
@@ -64,14 +64,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Attempt to read words from the two files
-    let link_words = read_words_from_file(args.to_link.unwrap())
-        .map_err(|e| e.to_string())?;
-    let avoid_words = read_words_from_file(args.to_avoid.unwrap())
-        .map_err(|e| e.to_string())?;
+    let link_words = read_words_from_file(args.to_link.unwrap()).map_err(|e| e.to_string())?;
+    let avoid_words = read_words_from_file(args.to_avoid.unwrap()).map_err(|e| e.to_string())?;
 
     // Get clues from API
     let clues = get_clues_from_api(link_words, avoid_words, &model_id).await?;
-    
+
     // Output
     if clues.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");

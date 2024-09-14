@@ -1,5 +1,5 @@
-use crate::api_handlers::api_instance::ApiInstance;
-use crate::json_models::chat_completion::ChatCompletionResponse;
+use super::api_instance::ApiInstance;
+use super::json_models::chat_completion::ChatCompletionResponse;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"You are the spymaster in Codenames.
@@ -64,7 +64,7 @@ fn clean_up_clues(clues: &mut Vec<String>) {
     clues.sort_by(|a, b| {
         let a_words: Vec<&str> = a.split_whitespace().collect();
         let b_words: Vec<&str> = b.split_whitespace().collect();
-        b_words[1].cmp(&a_words[1])
+        b_words[1].cmp(a_words[1])
     });
 }
 
