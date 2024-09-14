@@ -3,6 +3,7 @@ use std::io;
 use std::path::PathBuf;
 
 pub mod api_handlers;
+mod clue;
 
 pub fn read_words_from_file(path: PathBuf) -> Result<Vec<String>, io::Error> {
     let contents = fs::read_to_string(&path).map_err(|_| {
