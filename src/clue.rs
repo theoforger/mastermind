@@ -1,3 +1,7 @@
+use comfy_table::modifiers::UTF8_ROUND_CORNERS;
+use comfy_table::presets::UTF8_FULL;
+use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
+
 pub struct Clue {
     pub clue_word: String,
     pub count: usize,
@@ -12,10 +16,9 @@ impl Clue {
     /// Create a new instance of `Clue` from a single line of clue responses from the API
     pub fn new(clue_line: &str) -> Option<Self> {
         let chunks: Vec<&str> = clue_line.split_whitespace().collect();
-        println!("{:?}", chunks);
 
         // Discard empty lines as well as clues with only one word linked
-        if chunks.len() < 5 {
+        if chunks.len() < 4 {
             return None;
         }
 
@@ -37,10 +40,6 @@ impl Clue {
             linked_words,
         })
     }
-
-    pub fn display(&self) {
-        // TODO
-    }
 }
 
 impl ClueCollection {
@@ -58,7 +57,7 @@ impl ClueCollection {
 
     /// Sort the collection by number of words the clues link together
     pub fn sort(&mut self) {
-        self.clues.sort_by(|a, b| a.count.cmp(&b.count));
+        self.clues.sort_by(|a, b| b.count.cmp(&a.count));
     }
 
     pub fn is_empty(&self) -> bool {
@@ -66,6 +65,38 @@ impl ClueCollection {
     }
 
     pub fn display(&self) {
-        // Todo
+        let mut table = Table::new();
+        
+        // Set up header and styles
+        table
+            .set_header(vec![
+                Cell::new("Clue")
+                    .add_attribute(Attribute::Bold)
+                    .set_alignment(CellAlignment::Center),
+                Cell::new("Count")
+                    .add_attribute(Attribute::Bold)
+                    .set_alignment(CellAlignment::Center),
+                Cell::new("Linked Words")
+                    .add_attribute(Attribute::Bold)
+                    .set_alignment(CellAlignment::Center),
+            ])
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            .load_preset(UTF8_FULL)
+            .apply_modifier(UTF8_ROUND_CORNERS);
+
+        // Add rows
+        for clue in &self.clues {
+            table.add_row(vec![
+                clue.clue_word.clone(),
+                clue.count.to_string(),
+                clue.linked_words.join(" "),
+            ]);
+        }
+
+        // Center the second column
+        let second_column = table.column_mut(1).expect("The table has three columns");
+        second_column.set_cell_alignment(CellAlignment::Center);
+
+        println!("{table}");
     }
 }

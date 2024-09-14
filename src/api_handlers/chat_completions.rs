@@ -1,6 +1,6 @@
 use super::api_instance::ApiInstance;
 use super::json_models::chat_completion::ChatCompletionResponse;
-use crate::clue::{Clue, ClueCollection};
+use crate::clue::ClueCollection;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"You are the spymaster in Codenames.
@@ -9,13 +9,14 @@ Respond with a list of clue words followed by the words they are supposed to lin
 With each clue word, try to link as many words as possible.
 Here are the requirements:
 - Always answer in lower case.
+- No special characters.
 - Give 5 to 10 clue word options.
 - Do not give repeated clue words.
 - Never give any intro, outro or explanation.
 - Only give the words themselves. Do not add anything else.
 - Answer in this format:
-    [clue] [number of agent words] - [agent word] [agent word] [agent word]
-    [clue] [number of agent words] - [agent word] [agent word] [agent word]
+    [clue] [number of agent words] [agent word] [agent word] [agent word]
+    [clue] [number of agent words] [agent word] [agent word] [agent word]
     ...
 "#;
 
@@ -46,7 +47,7 @@ fn build_request_body_for_clues(
     })
 }
 
-pub async fn get_clues_from_api(
+pub async fn get_clue_collection_from_api(
     link_words: Vec<String>,
     avoid_words: Vec<String>,
     model_id: &str,

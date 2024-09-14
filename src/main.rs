@@ -67,13 +67,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let avoid_words = read_words_from_file(args.to_avoid.unwrap()).map_err(|e| e.to_string())?;
 
     // Get clues from API
-    let clue_collection = get_clues_from_api(link_words, avoid_words, &model_id).await?;
+    let clue_collection = get_clue_collection_from_api(link_words, avoid_words, &model_id).await?;
 
     // Output
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else {
-        // TODO
+        clue_collection.display();
     }
 
     Ok(())
