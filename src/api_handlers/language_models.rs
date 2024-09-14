@@ -1,5 +1,5 @@
-use crate::api_handlers::api_instance::ApiInstance;
-use crate::json_models::language_models::ModelsResponse;
+use super::api_instance::ApiInstance;
+use super::json_models::language_model::ModelsResponse;
 
 pub async fn get_model_ids_from_api() -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let api_instance = ApiInstance::new()?;
