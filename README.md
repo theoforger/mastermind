@@ -1,6 +1,8 @@
 # 🔮 Mastermind - A Second Brain for Spymasters
 
-Mastermind is a CLI tool designed to generate clue words for spymasters in the game of **Codenames**. It leverages language models of your choice and is written in Rust, because why not?
+Mastermind is a CLI tool designed to generate clue words for spymasters in the game of **Codenames**, leveraging large language models (LLMs) of your choice.
+
+Written in Rust, because why not?
 
 ![GitHub License](https://img.shields.io/github/license/theoforger/mastermind)
 
