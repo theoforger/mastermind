@@ -2,14 +2,14 @@ use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
 
-pub struct Clue {
-    pub clue_word: String,
-    pub count: usize,
-    pub linked_words: Vec<String>,
+struct Clue {
+    clue_word: String,
+    count: usize,
+    linked_words: Vec<String>,
 }
 
 pub struct ClueCollection {
-    pub clues: Vec<Clue>,
+    clues: Vec<Clue>,
 }
 
 impl Clue {
@@ -45,19 +45,12 @@ impl Clue {
 impl ClueCollection {
     /// Create an instance of `ClueCollection` from `Vec<String>`, which contains lines of clue response from the API
     pub fn new(clue_strings: Vec<String>) -> Self {
-        Self {
-            clues: clue_strings.iter().filter_map(|s| Clue::new(s)).collect(),
-        }
-    }
+        let mut clues: Vec<Clue> = clue_strings.iter().filter_map(|s| Clue::new(s)).collect();
 
-    /// Add `Clue` into the collection
-    pub fn add(&mut self, clue: Clue) {
-        self.clues.push(clue);
-    }
+        // Sort the clues by the number of words they link together
+        clues.sort_by(|a, b| b.count.cmp(&a.count));
 
-    /// Sort the collection by number of words the clues link together
-    pub fn sort(&mut self) {
-        self.clues.sort_by(|a, b| b.count.cmp(&a.count));
+        Self { clues }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -66,7 +59,7 @@ impl ClueCollection {
 
     pub fn display(&self) {
         let mut table = Table::new();
-        
+
         // Set up header and styles
         table
             .set_header(vec![
