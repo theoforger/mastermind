@@ -21,5 +21,15 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --verbose
-    - name: Testing -g
+    - name: Test -V
+      run: cargo run -- -V
+    - name: Test -h
+      run: cargo run -- -h
+    - name: Test -g
       run: cargo run -- -g
+    - name: Test Default
+      run: cargo run -- examples/link.txt examples/avoid.txt
+    - name: Test with Gemma2
+      run: cargo run -- examples/link.txt examples/avoid.txt -m gemma2-9b-it
+    - name: Test with Mixtral
+      run: cargo run -- examples/link.txt examples/avoid.txt -m mixtral-8x7b-32768
