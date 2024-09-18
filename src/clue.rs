@@ -83,12 +83,14 @@ impl ClueCollection {
             table.add_row(vec![
                 clue.clue_word.clone(),
                 clue.count.to_string(),
-                clue.linked_words.join(" "),
+                clue.linked_words.join(", "),
             ]);
         }
 
         // Center the second column
-        let second_column = table.column_mut(1).expect("The table has three columns");
+        let second_column = table
+            .column_mut(1)
+            .expect("The table should have three columns");
         second_column.set_cell_alignment(CellAlignment::Center);
 
         table.to_string()
