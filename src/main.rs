@@ -23,8 +23,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Attempt to read words from the two files
-    let link_words = read_words_from_file(args.to_link.unwrap()).map_err(|e| e.to_string())?;
-    let avoid_words = read_words_from_file(args.to_avoid.unwrap()).map_err(|e| e.to_string())?;
+    let link_words = read_words_from_file(args.to_link.unwrap())?;
+    let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
     // Get clues from API
     let clue_collection = api_instance
