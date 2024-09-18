@@ -1,24 +1,24 @@
 # 🔮 Mastermind - A Second Brain for Spymasters
 
-Mastermind is a CLI tool designed to generate clue words for spymasters in the game of **Codenames**, leveraging large language models (LLMs) of your choice.
+Mastermind is a CLI tool designed to generate clue words for spymasters in the game of **Codenames**, leveraging large language models (LLMs) of your choice!
 
-Written in Rust, because why not?
+Written in Rust 🦀, because why not?
 
 ![GitHub License](https://img.shields.io/github/license/theoforger/mastermind)
 
-<img src="demo.gif" width="75%" alt="A gif demo of the basic functions of this program."/>
+<img src="images/demo.gif" alt="A gif demo of the basic functions of this program."/>
 
 ## 💻 Usage
 
 To get started, prepare two text files:
 
-1. **Words to Link Together**: Contains the words from your own team.
-2. **Words to Avoid**: Contains:
+1. **Words to Link Together** - Contains the words from your own team.
+2. **Words to Avoid** - Contains:
     - Your opponent's words
     - Neutral words
     - The assassin word
 
-Each file should have one word per line. Refer to the [examples](examples) directory for sample files.
+One word per line. Refer to the [examples](examples) directory for sample files.
 
 Run the tool with:
 
@@ -43,7 +43,9 @@ Feel free to run the program multiple times to get the best result!
 - `rust`
 - `cargo`
 
-Install them using [`rustup`](https://www.rust-lang.org/tools/install), or through your package manager (note: some distributions may package them separately).
+Installing via [`rustup`](https://www.rust-lang.org/tools/install) is recommended.
+
+You may also get them from your package manager (note: some distributions may package them separately).
 
 ### Clone the Repository
 
