@@ -15,7 +15,8 @@ pub struct ClueCollection {
 impl Clue {
     /// Create a new instance of `Clue` from a single line of clue responses from the API
     pub fn new(clue_line: &str) -> Option<Self> {
-        let chunks: Vec<&str> = clue_line.split_whitespace().collect();
+        println!("{}", clue_line);
+        let chunks: Vec<&str> = clue_line.split(", ").collect();
 
         // Discard empty lines as well as clues with only one word linked
         if chunks.len() < 4 {
@@ -82,12 +83,14 @@ impl ClueCollection {
             table.add_row(vec![
                 clue.clue_word.clone(),
                 clue.count.to_string(),
-                clue.linked_words.join(" "),
+                clue.linked_words.join(", "),
             ]);
         }
 
         // Center the second column
-        let second_column = table.column_mut(1).expect("The table has three columns");
+        let second_column = table
+            .column_mut(1)
+            .expect("The table should have three columns");
         second_column.set_cell_alignment(CellAlignment::Center);
 
         table.to_string()
