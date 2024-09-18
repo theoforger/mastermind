@@ -43,6 +43,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Output
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
+    } else if let Some(output_path) = args.output {
+        println!("-o option is present, writing to file...");
+        write_content_to_file(output_path, clue_collection.output())?;
     } else {
         clue_collection.display();
     }
