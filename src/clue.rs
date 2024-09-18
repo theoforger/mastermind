@@ -15,7 +15,6 @@ pub struct ClueCollection {
 impl Clue {
     /// Create a new instance of `Clue` from a single line of clue responses from the API
     pub fn new(clue_line: &str) -> Option<Self> {
-        println!("{}", clue_line);
         let chunks: Vec<&str> = clue_line.split(", ").collect();
 
         // Discard empty lines as well as clues with only one word linked
