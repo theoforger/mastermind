@@ -14,7 +14,7 @@ impl Instance {
         let mut all_model_ids = response
             .json::<ModelsResponse>()
             .await
-            .map_err(|_| "Failed to parse API response from server when fetching model IDs")?
+            .map_err(|_| "Failed to parse model IDs from API server")?
             .data
             .iter()
             .map(|model| model.id.trim().to_string())

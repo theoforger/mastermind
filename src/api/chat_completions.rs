@@ -42,7 +42,7 @@ impl Instance {
         let clue_strings = response
             .json::<ChatCompletionResponse>()
             .await
-            .map_err(|_| "Failed to parse API response from server when fetching clues")?
+            .map_err(|_| "Failed to parse clues from API server")?
             .choices[0]
             .message
             .content
