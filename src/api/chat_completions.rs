@@ -9,8 +9,8 @@ I will give you a list of [agent word], followed by a list of [avoid word].
 Try to link [agent word] together.
 Tro to avoid [avoid word].
 Answer in this format:
-    [clue word] [number of agent words] [agent word] [agent word] [agent word]
-    ...
+[clue word], [number of agent words], [agent word], [agent word], [agent word]
+...
 Here are the requirements:
 - Always answer in lower case.
 - No special characters.
