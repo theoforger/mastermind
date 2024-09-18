@@ -18,7 +18,7 @@ To get started, prepare two text files:
     - Neutral words
     - The assassin word
 
-One word per line. Refer to the [examples](examples) directory for sample files.
+One word per line. Refer to the [`examples`](examples) directory for sample files.
 
 Run the tool with:
 
@@ -56,17 +56,16 @@ cd mastermind
 
 ### Configure Environment Variables
 
-Edit the [example.env](example.env) file to add or modify:
-
-- Your API key
-- The base URL of an OpenAI-compatible API
-- A default language model
-
-Rename the file to `.env`:
+Make a copy of [`example.env`](example.env) and name it `.env`
 
 ```bash
-mv example.env .env
+cp example.env .env
 ```
+
+Edit `.env` to add or modify:
+- API key
+- The base URL of an OpenAI-compatible API
+- A default language model
 
 ### Build the Project
 
