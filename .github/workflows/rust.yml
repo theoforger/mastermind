@@ -33,3 +33,5 @@ jobs:
       run: cargo run -- examples/link.txt examples/avoid.txt -m gemma2-9b-it
     - name: Test with Mixtral
       run: cargo run -- examples/link.txt examples/avoid.txt -m mixtral-8x7b-32768
+    - name: Test -o
+      run: cargo run -- examples/link.txt examples/avoid.txt -o output.txt
