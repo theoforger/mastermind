@@ -9,23 +9,23 @@ mod clue;
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-    /// Get available language json_models from API
+    /// Print all available language models
     #[arg(short, long = "get-models")]
     pub get: bool,
 
-    /// Specify a language model
+    /// Select a language model
     #[arg(short, long = "set-model")]
     pub model: Option<String>,
 
-    /// Specify an output file, instead of outputting to stdout
+    /// Specify an output file
     #[arg(short, long, value_name = "FILE")]
     pub output: Option<PathBuf>,
 
-    /// Path to a file containing words to link together - the words from your team
+    /// File containing words to link together - the words from your team
     #[arg(required_unless_present = "get")]
     pub to_link: Option<PathBuf>,
 
-    /// Path to a file containing words to avoid - opponent's words, neutral words, and the assassin word
+    /// File containing words to avoid - opponent's words, neutral words, and the assassin word
     #[arg(required_unless_present = "get")]
     pub to_avoid: Option<PathBuf>,
 }
