@@ -57,7 +57,7 @@ impl ClueCollection {
         self.clues.is_empty()
     }
 
-    pub fn display(&self) {
+    pub fn output(&self) -> String {
         let mut table = Table::new();
 
         // Set up header and styles
@@ -90,6 +90,10 @@ impl ClueCollection {
         let second_column = table.column_mut(1).expect("The table has three columns");
         second_column.set_cell_alignment(CellAlignment::Center);
 
-        println!("{table}");
+        table.to_string()
+    }
+
+    pub fn display(&self) {
+        println!("{}", self.output());
     }
 }
