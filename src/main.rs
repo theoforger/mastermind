@@ -1,7 +1,4 @@
-use std::env;
-
 use clap::Parser;
-use dotenv::dotenv;
 
 use mastermind::api::Instance;
 use mastermind::*;
@@ -10,7 +7,6 @@ use mastermind::*;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read arguments and environment variables
     let args = Args::parse();
-    dotenv().ok();
 
     // Create an API instance
     let mut api_instance = Instance::new()?;
@@ -22,14 +18,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // If -m is set, use a preferred language model
-    // Otherwise, set the default
-    let model_id = match args.model {
-        Some(id) => id,
-        None => env::var("DEFAULT_MODEL_ID").map_err(|_| {
-            "Could not read environment variable: DEFAULT_MODEL_ID. Use -m to specify a language model"
-        })?,
-    };
-    api_instance.set_model_id(model_id).await?;
+    if let Some(model_id) = args.model {
+        api_instance.set_model_id(model_id).await?;
+    }
 
     // Attempt to read words from the two files
     let link_words = read_words_from_file(args.to_link.unwrap()).map_err(|e| e.to_string())?;
@@ -44,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else if let Some(output_path) = args.output {
-        println!("-o option is present, writing to file...");
+        println!("Writing to file '{}'...", output_path.display());
         write_content_to_file(output_path, clue_collection.output())?;
     } else {
         clue_collection.display();

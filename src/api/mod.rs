@@ -16,23 +16,26 @@ impl Instance {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         dotenv().ok();
 
-        let base_url = env::var("OPENAI_API_BASE_URL")
-            .map_err(|_| "Cannot read environment variable: OPENAI_API_BASE_URL")?;
-
+        let base_url = Self::get_env_var("OPENAI_API_BASE_URL")?;
         let base_url = if !base_url.ends_with('/') {
             format!("{}/", base_url)
         } else {
             base_url
         };
-
-        let key = env::var("API_KEY").map_err(|_| "Cannot read environment variable: API_KEY")?;
+        let key = Self::get_env_var("API_KEY")?;
+        let model_id = Self::get_env_var("DEFAULT_MODEL_ID")?;
 
         Ok(Self {
             client: reqwest::Client::new(),
             base_url,
             key,
-            model_id: "".to_string(),
+            model_id,
         })
+    }
+
+    fn get_env_var(var_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+        env::var(var_name)
+            .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
     }
 
     pub async fn set_model_id(
