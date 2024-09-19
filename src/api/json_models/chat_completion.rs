@@ -10,7 +10,7 @@ pub struct Choice {
     pub message: Message,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize)]
 pub struct Usage {
     pub prompt_tokens: usize,
     pub completion_tokens: usize,
