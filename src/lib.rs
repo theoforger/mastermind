@@ -21,6 +21,10 @@ pub struct Args {
     #[arg(short, long, value_name = "FILE")]
     pub output: Option<PathBuf>,
 
+    /// Print all token usage information
+    #[arg(short, long = "token-usage")]
+    pub token: bool,
+
     /// File containing words to link together - the words from your team
     #[arg(required_unless_present = "get")]
     pub to_link: Option<PathBuf>,
