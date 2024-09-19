@@ -35,6 +35,7 @@ Feel free to run the program multiple times to get the best result!
 - `-o`, `--output` : Specify an output file
 - `-h`, `--help` : Print help
 - `-V`, `--version` : Print version
+- `-t`, `--token-usage` : Print token usage
 
 ## 🛠️ Building
 
