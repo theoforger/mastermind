@@ -1,7 +1,9 @@
-use super::json_models::chat_completion::{ChatCompletionResponse, Usage};
+use super::json_models::chat_completion::{ChatCompletionResponse};
 use super::Instance;
 use crate::clue::ClueCollection;
 use serde_json::json;
+
+
 
 const SYSTEM_PROMPT: &str = r#"
 You are the spymaster in Codenames.
@@ -25,7 +27,7 @@ impl Instance {
         &self,
         link_words: Vec<String>,
         avoid_words: Vec<String>,
-    ) -> Result<(ClueCollection, Usage), Box<dyn std::error::Error>> {
+    ) -> Result<ClueCollection, Box<dyn std::error::Error>> {
         let request_body = self.build_request_body(link_words, avoid_words);
 
         // Get response from API endpoint
@@ -44,7 +46,8 @@ impl Instance {
             .map_err(|_| "Failed to parse clues from API server")?;
 
         // Extract usage information from the parsed response
-        let usage = parsed_response.usage.clone();
+        let token_usage = parsed_response.usage;
+
 
         // Extract clue strings from the parsed response
         let clue_strings = parsed_response
@@ -58,9 +61,9 @@ impl Instance {
             .collect::<Vec<String>>();
 
         // Build clues
-        let clue_collection = ClueCollection::new(clue_strings);
+        let clue_collection = ClueCollection::new(clue_strings, token_usage);
 
-        Ok((clue_collection, usage))
+        Ok(clue_collection)
     }
 
     fn build_request_body(
