@@ -3,8 +3,6 @@ use clap::Parser;
 use mastermind::api::Instance;
 use mastermind::*;
 
-use std::io::{self, Write};
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read arguments and environment variables
@@ -29,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
     // Get clues from API
-    let (clue_collection, usage) = api_instance
+    let clue_collection = api_instance
         .fetch_clue_collection(link_words, avoid_words)
         .await?;
 
@@ -47,11 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // If -t is set, output the token usage information
     if args.token {
         // Write to stderr in the format: prompt_tokens, completion_tokens, total_tokens
-        writeln!(
-            io::stderr(),
-            "\nTokens Usage\n----------------------\nPrompt Tokens: {}\nCompletion Tokens: {}\n----------------------\nTotal Tokens: {}",
-            usage.prompt_tokens, usage.completion_tokens, usage.total_tokens
-        )?;
+        eprintln!("\nTokens Usage\n----------------------\nPrompt Tokens: {}\nCompletion Tokens: {}\n----------------------\nTotal Tokens: {}",
+                  clue_collection.usage.prompt_tokens, clue_collection.usage.completion_tokens, clue_collection.usage.total_tokens);
     }
 
     Ok(())
