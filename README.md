@@ -5,6 +5,7 @@ Mastermind is a CLI tool designed to generate clue words for spymasters in the g
 Written in Rust 🦀, because why not?
 
 ![GitHub License](https://img.shields.io/github/license/theoforger/mastermind)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/theoforger/mastermind/.github%2Fworkflows%2Frust.yml)
 
 <img src="images/demo.gif" alt="A gif demo of the basic functions of this program."/>
 
