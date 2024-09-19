@@ -1,4 +1,4 @@
-use super::json_models::chat_completion::ChatCompletionResponse;
+use super::json_models::chat_completion::{ChatCompletionResponse, Usage};
 use super::Instance;
 use crate::clue::ClueCollection;
 use serde_json::json;
@@ -25,7 +25,7 @@ impl Instance {
         &self,
         link_words: Vec<String>,
         avoid_words: Vec<String>,
-    ) -> Result<ClueCollection, Box<dyn std::error::Error>> {
+    ) -> Result<(ClueCollection, Usage), Box<dyn std::error::Error>> {
         let request_body = self.build_request_body(link_words, avoid_words);
 
         // Get response from API endpoint
@@ -38,12 +38,19 @@ impl Instance {
             .await
             .map_err(|_| "Failed to fetch clue collection from API server")?;
 
-        // Deserialize the response
-        let clue_strings = response
+        let parsed_response = response
             .json::<ChatCompletionResponse>()
             .await
-            .map_err(|_| "Failed to parse clues from API server")?
-            .choices[0]
+            .map_err(|_| "Failed to parse clues from API server")?;
+
+        // Extract usage information from the parsed response
+        let usage = parsed_response.usage.clone();
+
+        // Extract clue strings from the parsed response
+        let clue_strings = parsed_response
+            .choices
+            .get(0)
+            .ok_or("No choices returned from API")?
             .message
             .content
             .lines()
@@ -53,7 +60,7 @@ impl Instance {
         // Build clues
         let clue_collection = ClueCollection::new(clue_strings);
 
-        Ok(clue_collection)
+        Ok((clue_collection, usage))
     }
 
     fn build_request_body(
