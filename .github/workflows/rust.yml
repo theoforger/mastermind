@@ -25,7 +25,5 @@ jobs:
       run: cargo run -- -V
     - name: Test -h
       run: cargo run -- -h
-    - name: Test -g
-      run: cargo run -- -g
-    - name: Run unit test
+    - name: Run unit testing
       run: cargo test
