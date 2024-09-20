@@ -1,7 +1,7 @@
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
-
+use crate::api::json_models::chat_completion::Usage;
 struct Clue {
     clue_word: String,
     count: usize,
@@ -10,12 +10,15 @@ struct Clue {
 
 pub struct ClueCollection {
     clues: Vec<Clue>,
+    pub usage: Usage,
 }
 
 impl Clue {
     /// Create a new instance of `Clue` from a single line of clue responses from the API
     pub fn new(clue_line: &str) -> Option<Self> {
         let chunks: Vec<&str> = clue_line.split(", ").collect();
+
+
 
         // Discard empty lines as well as clues with only one word linked
         if chunks.len() < 4 {
@@ -44,13 +47,13 @@ impl Clue {
 
 impl ClueCollection {
     /// Create an instance of `ClueCollection` from `Vec<String>`, which contains lines of clue response from the API
-    pub fn new(clue_strings: Vec<String>) -> Self {
+    pub fn new(clue_strings: Vec<String>, usage: Usage) -> Self {
         let mut clues: Vec<Clue> = clue_strings.iter().filter_map(|s| Clue::new(s)).collect();
 
         // Sort the clues by the number of words they link together
         clues.sort_by(|a, b| b.count.cmp(&a.count));
 
-        Self { clues }
+        Self { clues, usage }
     }
 
     pub fn is_empty(&self) -> bool {

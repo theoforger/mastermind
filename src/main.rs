@@ -31,6 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .fetch_clue_collection(link_words, avoid_words)
         .await?;
 
+
     // Output
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
@@ -39,6 +40,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         write_content_to_file(output_path, clue_collection.output())?;
     } else {
         clue_collection.display();
+    }
+
+    // If -t is set, output the token usage information
+    if args.token {
+        // Write to stderr in the format: prompt_tokens, completion_tokens, total_tokens
+        eprintln!("\nTokens Usage\n----------------------\nPrompt Tokens: {}\nCompletion Tokens: {}\n----------------------\nTotal Tokens: {}",
+                  clue_collection.usage.prompt_tokens, clue_collection.usage.completion_tokens, clue_collection.usage.total_tokens);
     }
 
     Ok(())

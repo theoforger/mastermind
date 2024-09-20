@@ -1,5 +1,5 @@
-mod chat_completions;
-mod json_models;
+pub mod chat_completions;
+pub mod json_models;
 mod language_models;
 
 use dotenv::dotenv;
