@@ -1,4 +1,4 @@
-use crate::api::json_models::chat_completion::Usage;
+use crate::json_models::chat_completion::Usage;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};

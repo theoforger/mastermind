@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 pub mod api;
 mod clue;
+mod json_models;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
@@ -21,7 +22,7 @@ pub struct Args {
     #[arg(short, long, value_name = "FILE")]
     pub output: Option<PathBuf>,
 
-    /// Print all token usage information
+    /// Print token usage information
     #[arg(short, long = "token-usage")]
     pub token: bool,
 

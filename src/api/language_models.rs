@@ -1,4 +1,4 @@
-use super::json_models::language_model::ModelsResponse;
+use crate::json_models::language_model::ModelsResponse;
 use super::Instance;
 
 impl Instance {
