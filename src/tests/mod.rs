@@ -37,23 +37,10 @@ async fn test_fetch_language_models() {
     let response = api_instance.fetch_language_model_ids().await.unwrap();
     mock.assert();
 
-    // Compare results
-    let expected_response = [
-        "distil-whisper-large-v3-en",
-        "gemma-7b-it",
-        "gemma2-9b-it",
-        "llama-3.1-70b-versatile",
-        "llama-3.1-8b-instant",
-        "llama-guard-3-8b",
-        "llama3-70b-8192",
-        "llama3-8b-8192",
-        "llama3-groq-70b-8192-tool-use-preview",
-        "llama3-groq-8b-8192-tool-use-preview",
-        "llava-v1.5-7b-4096-preview",
-        "mixtral-8x7b-32768",
-        "whisper-large-v3",
-    ];
-    assert_eq!(response, expected_response);
+    // Compare outputs
+    let output = response.join("\n");
+    let expected_output = fs::read_to_string("src/tests/expected_outputs/language_models.txt").unwrap();
+    assert_eq!(output, expected_output);
 }
 
 #[tokio::test]
@@ -80,20 +67,9 @@ async fn test_fetch_clue_collection() {
         .unwrap();
     mock.assert();
 
-    // Compare results
-    let expected_response = "
-╭───────┬───────┬───────────────────────╮
-│  Clue ┆ Count ┆      Linked Words     │
-╞═══════╪═══════╪═══════════════════════╡
-│ music ┆   2   ┆ sound, bee            │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ film  ┆   2   ┆ bond, tokyo           │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ free  ┆   2   ┆ park, penny           │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ dive  ┆   2   ┆ scuba diver, hospital │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ large ┆   2   ┆ walrus, scuba diver   │
-╰───────┴───────┴───────────────────────╯";
-    assert_eq!(response.generate_table(), expected_response);
+    // Compare outputs
+    let output = response.generate_table();
+    let expected_output =
+        fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
+    assert_eq!(output.trim(), expected_output);
 }
