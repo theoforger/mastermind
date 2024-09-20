@@ -55,3 +55,45 @@ async fn test_fetch_language_models() {
     ];
     assert_eq!(response, expected_response);
 }
+
+#[tokio::test]
+async fn test_fetch_clue_collection() {
+    // Start a lightweight mock server.
+    let server = MockServer::start_async().await;
+
+    // Create a mock on the server.
+    let mock = server.mock(|when, then| {
+        when.method(POST).path("/chat/completions");
+        then.status(200)
+            .header("content-type", "application/json")
+            .body_from_file("src/tests/mock_responses/chat_completions.json");
+    });
+
+    // Create an API instance and set the base url to mock server url
+    let mut api_instance = Instance::new().unwrap();
+    api_instance.set_base_url(server.url("/"));
+
+    // Get response from mock server
+    let response = api_instance
+        .fetch_clue_collection(vec![], vec![])
+        .await
+        .unwrap();
+    mock.assert();
+
+    // Compare results
+    let expected_response = "
+╭───────┬───────┬───────────────────────╮
+│  Clue ┆ Count ┆      Linked Words     │
+╞═══════╪═══════╪═══════════════════════╡
+│ music ┆   2   ┆ sound, bee            │
+├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ film  ┆   2   ┆ bond, tokyo           │
+├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ free  ┆   2   ┆ park, penny           │
+├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ dive  ┆   2   ┆ scuba diver, hospital │
+├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ large ┆   2   ┆ walrus, scuba diver   │
+╰───────┴───────┴───────────────────────╯";
+    assert_eq!(response.generate_table(), expected_response);
+}
