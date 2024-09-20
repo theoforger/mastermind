@@ -1,13 +1,5 @@
-╭───────┬───────┬───────────────────────╮
-│  Clue ┆ Count ┆      Linked Words     │
-╞═══════╪═══════╪═══════════════════════╡
-│ music ┆   2   ┆ sound, bee            │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ film  ┆   2   ┆ bond, tokyo           │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ free  ┆   2   ┆ park, penny           │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ dive  ┆   2   ┆ scuba diver, hospital │
-├╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ large ┆   2   ┆ walrus, scuba diver   │
-╰───────┴───────┴───────────────────────╯
+music 2 - sound, bee
+film 2 - bond, tokyo
+free 2 - park, penny
+dive 2 - scuba diver, hospital
+large 2 - walrus, scuba diver

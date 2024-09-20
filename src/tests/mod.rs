@@ -68,8 +68,8 @@ async fn test_fetch_clue_collection() {
     mock.assert();
 
     // Compare outputs
-    let output = response.generate_table();
+    let output = response.generate_raw_list();
     let expected_output =
         fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
-    assert_eq!(output.trim(), expected_output);
+    assert_eq!(output, expected_output);
 }
