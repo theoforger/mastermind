@@ -31,7 +31,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .fetch_clue_collection(link_words, avoid_words)
         .await?;
 
-
     // Output
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");

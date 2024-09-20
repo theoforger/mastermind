@@ -57,11 +57,7 @@ pub fn write_content_to_file(
 ) -> Result<(), Box<dyn std::error::Error>> {
     if let Ok(existing_content) = fs::read_to_string(&path) {
         if !existing_content.is_empty() {
-            return Err(format!(
-                "File is not empty: {}",
-                path.to_string_lossy()
-            )
-            .into());
+            return Err(format!("File is not empty: {}", path.to_string_lossy()).into());
         }
     }
 

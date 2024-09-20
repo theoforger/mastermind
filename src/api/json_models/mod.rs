@@ -1,2 +1,2 @@
-pub mod language_model;
 pub mod chat_completion;
+pub mod language_model;

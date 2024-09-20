@@ -1,9 +1,7 @@
-use super::json_models::chat_completion::{ChatCompletionResponse};
+use super::json_models::chat_completion::ChatCompletionResponse;
 use super::Instance;
 use crate::clue::ClueCollection;
 use serde_json::json;
-
-
 
 const SYSTEM_PROMPT: &str = r#"
 You are the spymaster in Codenames.
@@ -48,12 +46,11 @@ impl Instance {
         // Extract usage information from the parsed response
         let token_usage = parsed_response.usage;
 
-
         // Extract clue strings from the parsed response
         let clue_strings = parsed_response
             .choices
-            .get(0)
-            .ok_or("No choices returned from API")?
+            .first()
+            .ok_or("Failed to parse clues from API server")?
             .message
             .content
             .lines()
