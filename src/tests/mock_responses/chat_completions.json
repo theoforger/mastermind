@@ -1,0 +1,30 @@
+{
+  "id": "chatcmpl-869ede85-2f46-4834-a039-28d757e958a5",
+  "object": "chat.completion",
+  "created": 1726870549,
+  "model": "llama-3.1-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "music, 2, sound, bee\nfilm, 2, bond, tokyo\nfree, 2, park, penny\ndive, 2, scuba diver, hospital\nlarge, 2, walrus, scuba diver"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.005669406999999987,
+    "prompt_tokens": 222,
+    "prompt_time": 0.068204384,
+    "completion_tokens": 53,
+    "completion_time": 0.214023764,
+    "total_tokens": 275,
+    "total_time": 0.282228148
+  },
+  "system_fingerprint": "fp_b6828be2c9",
+  "x_groq": {
+    "id": "req_01j88r2wfmecr9zgpjn2zmnprb"
+  }
+}

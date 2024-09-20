@@ -99,7 +99,7 @@ impl ClueCollection {
     pub fn display_table(&self) {
         println!("{}", self.generate_table());
     }
-    
+
     pub fn display_token_info(&self) {
         eprintln!(
             "\nToken Usage:\n\
@@ -108,9 +108,21 @@ impl ClueCollection {
             Completion Tokens: {}\n\
             ----------------------\n\
             Total Tokens: {}",
-            self.usage.prompt_tokens,
-            self.usage.completion_tokens,
-            self.usage.total_tokens
+            self.usage.prompt_tokens, self.usage.completion_tokens, self.usage.total_tokens
         );
+    }
+
+    pub fn generate_raw_list(&self) -> String {
+        let mut raw_list = String::new();
+        for clue in &self.clues {
+            let clue_string = format!(
+                "{} {} - {}\n",
+                clue.clue_word,
+                clue.count,
+                clue.linked_words.join(", ")
+            );
+            raw_list.push_str(clue_string.as_str());
+        }
+        raw_list
     }
 }

@@ -1,6 +1,6 @@
-use crate::json_models::chat_completion::ChatCompletionResponse;
 use super::Instance;
 use crate::clue::ClueCollection;
+use crate::json_models::chat_completion::ChatCompletionResponse;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"
@@ -36,21 +36,18 @@ impl Instance {
             .json(&request_body)
             .send()
             .await
-            .map_err(|_| "Failed to fetch clue collection from API server")?;
+            .map_err(|e| format!("Failed to fetch clue collection from API server: {}", e))?;
 
         let parsed_response = response
             .json::<ChatCompletionResponse>()
             .await
-            .map_err(|_| "Failed to parse clues from API server")?;
+            .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
 
         // Extract usage information from the parsed response
         let token_usage = parsed_response.usage;
 
         // Extract clue strings from the parsed response
-        let clue_strings = parsed_response
-            .choices
-            .first()
-            .ok_or("Failed to parse clues from API server")?
+        let clue_strings = parsed_response.choices[0]
             .message
             .content
             .lines()

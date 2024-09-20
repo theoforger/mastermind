@@ -42,7 +42,7 @@ impl Instance {
         model_id: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Return Error if the chosen model is not valid
-        let valid_model_ids = self.fetch_all_model_ids().await?;
+        let valid_model_ids = self.fetch_language_model_ids().await?;
         if !valid_model_ids.contains(&model_id) {
             return Err(format!(
                 "{} is not a valid language model from your provider",
@@ -53,5 +53,9 @@ impl Instance {
 
         self.model_id = model_id;
         Ok(())
+    }
+
+    pub fn set_base_url(&mut self, base_url: String) {
+        self.base_url = base_url;
     }
 }
