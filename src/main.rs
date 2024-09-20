@@ -36,16 +36,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else if let Some(output_path) = args.output {
         println!("Writing to file '{}'...", output_path.display());
-        write_content_to_file(output_path, clue_collection.output())?;
+        write_content_to_file(output_path, clue_collection.generate_table())?;
     } else {
-        clue_collection.display();
+        clue_collection.display_table();
     }
 
-    // If -t is set, output the token usage information
+    // If -t is set, output token usage information
     if args.token {
-        // Write to stderr in the format: prompt_tokens, completion_tokens, total_tokens
-        eprintln!("\nTokens Usage\n----------------------\nPrompt Tokens: {}\nCompletion Tokens: {}\n----------------------\nTotal Tokens: {}",
-                  clue_collection.usage.prompt_tokens, clue_collection.usage.completion_tokens, clue_collection.usage.total_tokens);
+        clue_collection.display_token_info();
     }
 
     Ok(())

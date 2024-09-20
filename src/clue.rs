@@ -58,7 +58,7 @@ impl ClueCollection {
         self.clues.is_empty()
     }
 
-    pub fn output(&self) -> String {
+    pub fn generate_table(&self) -> String {
         let mut table = Table::new();
 
         // Set up header and styles
@@ -96,7 +96,21 @@ impl ClueCollection {
         table.to_string()
     }
 
-    pub fn display(&self) {
-        println!("{}", self.output());
+    pub fn display_table(&self) {
+        println!("{}", self.generate_table());
+    }
+    
+    pub fn display_token_info(&self) {
+        eprintln!(
+            "\nToken Usage:\n\
+            ----------------------\n\
+            Prompt Tokens: {}\n\
+            Completion Tokens: {}\n\
+            ----------------------\n\
+            Total Tokens: {}",
+            self.usage.prompt_tokens,
+            self.usage.completion_tokens,
+            self.usage.total_tokens
+        );
     }
 }
