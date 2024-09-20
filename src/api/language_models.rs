@@ -2,7 +2,7 @@ use super::Instance;
 use crate::json_models::language_model::ModelsResponse;
 
 impl Instance {
-    pub async fn fetch_all_model_ids(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    pub async fn fetch_language_model_ids(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let response = self
             .client
             .get(format!("{}models", self.base_url))

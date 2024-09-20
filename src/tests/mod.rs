@@ -34,7 +34,7 @@ async fn test_fetch_language_models() {
     api_instance.set_base_url(server.url("/"));
 
     // Get response from mock server
-    let response = api_instance.fetch_all_model_ids().await.unwrap();
+    let response = api_instance.fetch_language_model_ids().await.unwrap();
     mock.assert();
 
     // Compare results

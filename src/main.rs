@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // If -g is set, call the models API endpoint instead
     if args.get {
-        println!("{}", api_instance.fetch_all_model_ids().await?.join("\n"));
+        println!("{}", api_instance.fetch_language_model_ids().await?.join("\n"));
         return Ok(());
     }
 
