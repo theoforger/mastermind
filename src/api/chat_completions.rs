@@ -1,4 +1,4 @@
-use super::json_models::chat_completion::ChatCompletionResponse;
+use crate::json_models::chat_completion::ChatCompletionResponse;
 use super::Instance;
 use crate::clue::ClueCollection;
 use serde_json::json;
