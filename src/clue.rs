@@ -10,7 +10,7 @@ struct Clue {
 
 pub struct ClueCollection {
     clues: Vec<Clue>,
-    pub usage: Usage,
+    usage: Usage,
 }
 
 impl Clue {
