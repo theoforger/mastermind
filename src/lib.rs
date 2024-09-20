@@ -5,6 +5,8 @@ use std::path::PathBuf;
 pub mod api;
 mod clue;
 mod json_models;
+#[cfg(test)]
+mod tests;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
