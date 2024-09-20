@@ -34,9 +34,9 @@ Feel free to run the program multiple times to get the best result!
 - `-g`, `--get-models` : Print all available language models
 - `-m`, `--set-model` : Select a language model
 - `-o`, `--output` : Specify an output file
+- `-t`, `--token-usage` : Print token usage
 - `-h`, `--help` : Print help
 - `-V`, `--version` : Print version
-- `-t`, `--token-usage` : Print token usage
 
 ## 🛠️ Building
 
