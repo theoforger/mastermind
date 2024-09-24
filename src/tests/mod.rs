@@ -4,7 +4,7 @@ use httpmock::prelude::*;
 
 #[test]
 fn test_api_instance() {
-    let api_instance = api::Instance::new();
+    let api_instance = Instance::new();
     assert!(api_instance.is_ok());
 }
 
