@@ -9,7 +9,6 @@ pub struct Instance {
     client: reqwest::Client,
     base_url: String,
     key: String,
-    model_id: String,
 }
 
 impl Instance {
@@ -23,13 +22,11 @@ impl Instance {
             base_url
         };
         let key = Self::get_env_var("API_KEY")?;
-        let model_id = Self::get_env_var("DEFAULT_MODEL_ID")?;
 
         Ok(Self {
             client: reqwest::Client::new(),
             base_url,
             key,
-            model_id,
         })
     }
 

@@ -1,5 +1,6 @@
+use std::env;
 use clap::Parser;
-
+use dotenv::dotenv;
 use mastermind::api::Instance;
 use mastermind::clue::ClueCollection;
 use mastermind::json_models::chat_completions::ChatCompletionsResponse;
@@ -10,6 +11,7 @@ use mastermind::*;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read arguments and environment variables
     let args = Args::parse();
+    dotenv().ok();
 
     // Create an API instance and get all available models
     let mut api_instance = Instance::new()?;
@@ -23,12 +25,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // If -m is set, use a preferred language model
-    if let Some(model_id) = args.model {
-        if model_id == "interactive" {
+    if let Some(model_ids) = args.model {
+        if model_ids[0] == "interactive" {
             let selected_model = model_collection.prompt_selection()[0].to_string();
             api_instance.set_model_id(selected_model).await?;
         } else {
-            api_instance.set_model_id(model_id).await?;
+            let selected_model = env::var("DEFAULT_MODEL_ID")
+                .map_err(|_| "Cannot read environment variable: DEFAULT_MODEL_ID".into())?;
+            api_instance.set_model_id(selected_model).await?;
         }
     }
 
