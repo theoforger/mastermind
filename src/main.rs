@@ -1,6 +1,7 @@
 use clap::Parser;
 
 use mastermind::api::Instance;
+use mastermind::model_collection::ModelCollection;
 use mastermind::*;
 
 #[tokio::main]
@@ -8,18 +9,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read arguments and environment variables
     let args = Args::parse();
 
-    // Create an API instance
+    // Create an API instance and get all available models
     let mut api_instance = Instance::new()?;
+    let models_response = api_instance.get_models().await?;
+    let model_collection = ModelCollection::new(models_response);
 
     // If -g is set, call the models API endpoint instead
     if args.get {
-        println!("{}", api_instance.get_models().await?.join("\n"));
+        println!("{}", model_collection.generate_string());
         return Ok(());
     }
 
     // If -m is set, use a preferred language model
     if let Some(model_id) = args.model {
-        api_instance.set_model_id(model_id).await?;
+        if model_id == "interactive" {
+            let selected_model = model_collection.prompt_selection()[0].to_string();
+            api_instance.set_model_id(selected_model).await?;
+        } else {
+            api_instance.set_model_id(model_id).await?;
+        }
     }
 
     // Attempt to read words from the two files

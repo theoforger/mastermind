@@ -1,7 +1,7 @@
 use crate::json_models::language_models::ModelsResponse;
 use dialoguer::MultiSelect;
 
-struct ModelCollection {
+pub struct ModelCollection {
     model_ids: Vec<String>,
 }
 
@@ -31,5 +31,13 @@ impl ModelCollection {
             .collect();
 
         chosen_model_ids
+    }
+
+    pub fn generate_string(&self) -> String {
+        self.model_ids.join("\n")
+    }
+
+    pub fn contains(&self, model_id: &String) -> bool {
+        self.model_ids.contains(model_id)
     }
 }

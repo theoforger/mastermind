@@ -3,6 +3,7 @@ mod language_models;
 
 use dotenv::dotenv;
 use std::env;
+use crate::model_collection::ModelCollection;
 
 pub struct Instance {
     client: reqwest::Client,
@@ -42,8 +43,10 @@ impl Instance {
         model_id: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Return Error if the chosen model is not valid
-        let valid_model_ids = self.get_models().await?;
-        if !valid_model_ids.contains(&model_id) {
+        let models_response = self.get_models().await?;
+        let model_collection = ModelCollection::new(models_response);
+        
+        if !model_collection.contains(&model_id) {
             return Err(format!(
                 "{} is not a valid language model from your provider",
                 model_id

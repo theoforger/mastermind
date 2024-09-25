@@ -5,9 +5,9 @@ use std::path::PathBuf;
 pub mod api;
 mod clue;
 mod json_models;
+pub mod model_collection;
 #[cfg(test)]
 mod tests;
-mod model_collection;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
@@ -18,7 +18,7 @@ pub struct Args {
     pub get: bool,
 
     /// Select a language model
-    #[arg(short, long = "set-model")]
+    #[arg(short, long = "set-model", default_missing_value = "interactive", num_args = 0..=1)]
     pub model: Option<String>,
 
     /// Specify an output file
