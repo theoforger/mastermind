@@ -14,12 +14,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     dotenv().ok();
 
-    // Create an API instance and get all available models
+    // Create an API instance and get all available models from API
     let api_instance = api::Instance::new()?;
     let models_response = api_instance.get_models().await?;
     let model_collection = ModelCollection::new(models_response);
 
-    // If -g is set, call the models API endpoint instead
+    // If -g is set, display models and exit the program
     if args.get {
         model_collection.display_list();
         return Ok(());
@@ -74,6 +74,7 @@ async fn obtain_clue_collection(
     for model_id in selected_model_ids {
         // Validate each selected model
         model_collection.validate_model_id(model_id)?;
+        // Get response from API
         let response = api_instance
             .post_chat_completions(&link_words, &avoid_words, model_id)
             .await?;
@@ -86,7 +87,6 @@ async fn obtain_clue_collection(
 }
 
 fn handle_output(args: &Args, clue_collection: ClueCollection) -> Result<(), Box<dyn Error>> {
-    // Output
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else if let Some(output_path) = &args.output {
