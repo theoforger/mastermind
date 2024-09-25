@@ -16,7 +16,7 @@ pub struct ClueCollection {
 
 impl Clue {
     /// Create a new instance of `Clue` from a single line of clue out of the API response
-    pub fn new(clue_line: &str, source: &str) -> Option<Self> {
+    pub fn new(clue_line: &str, source: String) -> Option<Self> {
         let chunks: Vec<&str> = clue_line.split(", ").collect();
 
         // Discard empty lines as well as clues with only one word linked
@@ -40,7 +40,7 @@ impl Clue {
             clue_word,
             count,
             linked_words,
-            source: source.to_string(),
+            source,
         })
     }
 }
@@ -48,17 +48,33 @@ impl Clue {
 impl ClueCollection {
     /// Create a new instance of `ClueCollection` from `Vec<ChatCompletionsResponse>`
     pub fn new(responses: Vec<ChatCompletionsResponse>) -> Self {
-        let mut clues: Vec<Clue>;
-        for response in responses{
+        let mut clues: Vec<Clue> = vec![];
+
+        let mut usage = Usage {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
+        };
+        
+        // Aggregate clues and token usage information
+        for response in responses {
             for choice in response.choices {
-                clues.push(choice.message.content.lines().filter_map(|s| Clue::new(s,)).collect());
+                for line in choice.message.content.lines() {
+                    if let Some(clue) = Clue::new(line, response.model.clone()) {
+                        clues.push(clue);
+                    }
+                }
             }
+            usage.prompt_tokens += response.usage.prompt_tokens;
+            usage.completion_tokens += response.usage.completion_tokens;
+            usage.total_tokens += response.usage.total_tokens;
         }
 
         // Sort the clues by the number of words they link together
         clues.sort_by(|a, b| b.count.cmp(&a.count));
 
-        Self { clues }
+        // Return
+        Self { clues, usage }
     }
 
     pub fn is_empty(&self) -> bool {
