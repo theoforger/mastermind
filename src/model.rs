@@ -1,4 +1,4 @@
-use crate::json_models::language_models::ModelsResponse;
+use crate::json::models::ModelsResponse;
 use dialoguer::MultiSelect;
 
 pub struct ModelCollection {
@@ -20,7 +20,7 @@ impl ModelCollection {
 
     pub fn prompt_selection(&self) -> Vec<String> {
         let chosen_indexes = MultiSelect::new()
-            .with_prompt("Choose language model(s)\n[Space] to select, [Enter] to confirm")
+            .with_prompt("[Space] to select, [Enter] to confirm\nYour choice(s)")
             .items(&self.model_ids)
             .interact()
             .unwrap();

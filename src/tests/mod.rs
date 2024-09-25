@@ -1,8 +1,8 @@
 use super::*;
 use crate::api::Instance;
-use httpmock::prelude::*;
 use crate::clue::ClueCollection;
-use crate::model_collection::ModelCollection;
+use crate::model::ModelCollection;
+use httpmock::prelude::*;
 
 #[test]
 fn test_api_instance() {
@@ -28,7 +28,7 @@ async fn test_get_models() {
         when.method(GET).path("/models");
         then.status(200)
             .header("content-type", "application/json")
-            .body_from_file("src/tests/mock_responses/language_models.json");
+            .body_from_file("src/tests/mock_responses/models.json");
     });
 
     // Create an API instance and set the base url to mock server url
@@ -41,7 +41,7 @@ async fn test_get_models() {
 
     // Compare outputs
     let output = response.generate_list();
-    let expected_output = fs::read_to_string("src/tests/expected_outputs/language_models.txt").unwrap();
+    let expected_output = fs::read_to_string("src/tests/expected_outputs/models.txt").unwrap();
     assert_eq!(output, expected_output);
 }
 
@@ -64,7 +64,7 @@ async fn test_post_chat_completions() {
 
     // Get responses from mock server
     let responses = vec![api_instance
-        .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new(),&String::new())
+        .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new(), &String::new())
         .await
         .unwrap()];
     mock.assert();

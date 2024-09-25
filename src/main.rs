@@ -4,7 +4,7 @@ use std::env;
 
 use mastermind::api::Instance;
 use mastermind::clue::ClueCollection;
-use mastermind::model_collection::ModelCollection;
+use mastermind::model::ModelCollection;
 use mastermind::*;
 
 #[tokio::main]

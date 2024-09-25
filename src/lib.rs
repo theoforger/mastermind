@@ -4,8 +4,8 @@ use std::path::PathBuf;
 
 pub mod api;
 pub mod clue;
-pub mod json_models;
-pub mod model_collection;
+mod json;
+pub mod model;
 #[cfg(test)]
 mod tests;
 

@@ -1,5 +1,5 @@
 use super::Instance;
-use crate::json_models::chat_completions::ChatCompletionsResponse;
+use crate::json::chat_completions::ChatCompletionsResponse;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"

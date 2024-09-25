@@ -1,5 +1,5 @@
 mod chat_completions;
-mod language_models;
+mod models;
 
 use dotenv::dotenv;
 use std::env;

@@ -1,5 +1,5 @@
 use super::Instance;
-use crate::json_models::language_models::ModelsResponse;
+use crate::json::models::ModelsResponse;
 
 impl Instance {
     pub async fn get_models(&self) -> Result<ModelsResponse, Box<dyn std::error::Error>> {
