@@ -2,7 +2,7 @@ use super::Instance;
 use crate::json_models::language_models::ModelsResponse;
 
 impl Instance {
-    pub async fn get_models(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    pub async fn get_models(&self) -> Result<ModelsResponse, Box<dyn std::error::Error>> {
         let response = self
             .client
             .get(format!("{}models", self.base_url))
@@ -11,17 +11,11 @@ impl Instance {
             .await
             .map_err(|e| format!("Failed to fetch model IDs from API server: {}", e))?;
 
-        let mut all_model_ids = response
+        let parsed_response = response
             .json::<ModelsResponse>()
             .await
-            .map_err(|e| format!("Failed to parse model IDs from API server: {}", e))?
-            .data
-            .iter()
-            .map(|model| model.id.trim().to_string())
-            .collect::<Vec<String>>();
+            .map_err(|e| format!("Failed to parse model IDs from API server: {}", e))?;
 
-        all_model_ids.sort();
-
-        Ok(all_model_ids)
+        Ok(parsed_response)
     }
 }
