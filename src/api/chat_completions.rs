@@ -43,17 +43,6 @@ impl Instance {
             .await
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
 
-        // Extract usage information from the parsed response
-        let token_usage = parsed_response.usage;
-
-        // Extract clue strings from the parsed response
-        let clue_strings = parsed_response.choices[0]
-            .message
-            .content
-            .lines()
-            .map(|line| line.trim().to_string())
-            .collect::<Vec<String>>();
-
         // Build clues
         let clue_collection = ClueCollection::new(clue_strings, token_usage);
 

@@ -1,4 +1,4 @@
-use crate::json_models::chat_completions::Usage;
+use crate::json_models::chat_completions::{ChatCompletionsResponse, Usage};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
@@ -6,6 +6,7 @@ struct Clue {
     clue_word: String,
     count: usize,
     linked_words: Vec<String>,
+    source: String,
 }
 
 pub struct ClueCollection {
@@ -15,7 +16,7 @@ pub struct ClueCollection {
 
 impl Clue {
     /// Create a new instance of `Clue` from a single line of clue out of the API response
-    pub fn new(clue_line: &str) -> Option<Self> {
+    pub fn new(clue_line: &str, source: &str) -> Option<Self> {
         let chunks: Vec<&str> = clue_line.split(", ").collect();
 
         // Discard empty lines as well as clues with only one word linked
@@ -39,19 +40,25 @@ impl Clue {
             clue_word,
             count,
             linked_words,
+            source: source.to_string(),
         })
     }
 }
 
 impl ClueCollection {
-    /// Create a new instance of `ClueCollection` from `Vec<String>`, which contains lines of clues from the API
-    pub fn new(clue_strings: Vec<String>, usage: Usage) -> Self {
-        let mut clues: Vec<Clue> = clue_strings.iter().filter_map(|s| Clue::new(s)).collect();
+    /// Create a new instance of `ClueCollection` from `Vec<ChatCompletionsResponse>`
+    pub fn new(responses: Vec<ChatCompletionsResponse>) -> Self {
+        let mut clues: Vec<Clue>;
+        for response in responses{
+            for choice in response.choices {
+                clues.push(choice.message.content.lines().filter_map(|s| Clue::new(s,)).collect());
+            }
+        }
 
         // Sort the clues by the number of words they link together
         clues.sort_by(|a, b| b.count.cmp(&a.count));
 
-        Self { clues, usage }
+        Self { clues }
     }
 
     pub fn is_empty(&self) -> bool {
