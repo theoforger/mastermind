@@ -40,7 +40,7 @@ async fn test_get_models() {
     mock.assert();
 
     // Compare outputs
-    let output = response.generate_string();
+    let output = response.generate_list();
     let expected_output = fs::read_to_string("src/tests/expected_outputs/language_models.txt").unwrap();
     assert_eq!(output, expected_output);
 }
@@ -70,7 +70,7 @@ async fn test_post_chat_completions() {
     mock.assert();
 
     // Compare outputs
-    let output = ClueCollection::new(responses).generate_raw_list();
+    let output = ClueCollection::new(responses).generate_list();
     let expected_output =
         fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
     assert_eq!(output, expected_output);

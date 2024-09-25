@@ -55,7 +55,7 @@ impl ClueCollection {
             completion_tokens: 0,
             total_tokens: 0,
         };
-        
+
         // Aggregate clues and token usage information
         for response in responses {
             for choice in response.choices {
@@ -81,6 +81,20 @@ impl ClueCollection {
         self.clues.is_empty()
     }
 
+    pub fn generate_list(&self) -> String {
+        let mut list = String::new();
+        for clue in &self.clues {
+            let clue_string = format!(
+                "{} {} - {}\n",
+                clue.clue_word,
+                clue.count,
+                clue.linked_words.join(", ")
+            );
+            list.push_str(clue_string.as_str());
+        }
+        list
+    }
+
     pub fn generate_table(&self) -> String {
         let mut table = Table::new();
 
@@ -98,7 +112,7 @@ impl ClueCollection {
                     .set_alignment(CellAlignment::Center),
                 Cell::new("Source")
                     .add_attribute(Attribute::Bold)
-                    .set_alignment(CellAlignment::Center)
+                    .set_alignment(CellAlignment::Center),
             ])
             .set_content_arrangement(ContentArrangement::Dynamic)
             .load_preset(UTF8_FULL)
@@ -110,7 +124,7 @@ impl ClueCollection {
                 clue.clue_word.clone(),
                 clue.count.to_string(),
                 clue.linked_words.join(", "),
-                clue.source.clone()
+                clue.source.clone(),
             ]);
         }
 
@@ -121,6 +135,10 @@ impl ClueCollection {
         second_column.set_cell_alignment(CellAlignment::Center);
 
         table.to_string()
+    }
+
+    pub fn display_list(&self) {
+        println!("{}", self.generate_list());
     }
 
     pub fn display_table(&self) {
@@ -137,19 +155,5 @@ impl ClueCollection {
             Total Tokens: {}",
             self.usage.prompt_tokens, self.usage.completion_tokens, self.usage.total_tokens
         );
-    }
-
-    pub fn generate_raw_list(&self) -> String {
-        let mut raw_list = String::new();
-        for clue in &self.clues {
-            let clue_string = format!(
-                "{} {} - {}\n",
-                clue.clue_word,
-                clue.count,
-                clue.linked_words.join(", ")
-            );
-            raw_list.push_str(clue_string.as_str());
-        }
-        raw_list
     }
 }

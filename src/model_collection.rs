@@ -33,8 +33,12 @@ impl ModelCollection {
         chosen_model_ids
     }
 
-    pub fn generate_string(&self) -> String {
+    pub fn generate_list(&self) -> String {
         self.model_ids.join("\n")
+    }
+
+    pub fn display_list(&self) {
+        println!("{}", self.generate_list());
     }
 
     pub fn contains(&self, model_id: &String) -> bool {

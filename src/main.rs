@@ -1,11 +1,12 @@
 use clap::Parser;
 use dotenv::dotenv;
+use std::env;
+
 use mastermind::api::Instance;
 use mastermind::clue::ClueCollection;
 use mastermind::json_models::chat_completions::ChatCompletionsResponse;
 use mastermind::model_collection::ModelCollection;
 use mastermind::*;
-use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,7 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // If -g is set, call the models API endpoint instead
     if args.get {
-        println!("{}", model_collection.generate_string());
+        model_collection.display_list();
         return Ok(());
     }
 
@@ -29,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
     // If -m is present and has values, use the preferred language models
-    // If -m is present but doesn't have a value, prompt interactive menu
+    // If -m is present but doesn't have a value, prompt selection menu
     // If -m is not present, use the default from environment variable
     let selected_model_ids = match args.models {
         Some(model_ids) => {
