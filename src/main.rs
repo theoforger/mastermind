@@ -1,8 +1,9 @@
 use clap::Parser;
 
 use mastermind::api::Instance;
-use mastermind::*;
 use mastermind::clue::ClueCollection;
+use mastermind::json_models::chat_completions::ChatCompletionsResponse;
+use mastermind::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,18 +19,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // If -m is set, use a preferred language model
-    if let Some(model_id) = args.model {
-        api_instance.set_model_id(model_id).await?;
-    }
-
     // Attempt to read words from the two files
     let link_words = read_words_from_file(args.to_link.unwrap())?;
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
-    // Get clues from API
-    let responses = 
-    let clue_collection = ClueCollection::new(responses)
+    // Get responses
+    // If -m is set, use a preferred language model(s)
+    // Otherwise, call the API straight away
+    let responses = match args.model {
+        Some(model_ids) => {
+            let mut responses: Vec<ChatCompletionsResponse> = vec![];
+            for model_id in model_ids {
+                api_instance.set_model_id(model_id).await?;
+                let response = api_instance
+                    .post_chat_completions(&link_words, &avoid_words)
+                    .await?;
+                responses.push(response);
+            }
+            responses
+        }
+        None => vec![
+            api_instance
+                .post_chat_completions(&link_words, &avoid_words)
+                .await?,
+        ],
+    };
+
+    // Build ClueCollection from the responses
+    let clue_collection = ClueCollection::new(responses);
 
     // Output
     if clue_collection.is_empty() {

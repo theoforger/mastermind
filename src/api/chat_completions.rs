@@ -1,5 +1,4 @@
 use super::Instance;
-use crate::clue::ClueCollection;
 use crate::json_models::chat_completions::ChatCompletionsResponse;
 use serde_json::json;
 
@@ -23,8 +22,8 @@ Here are the requirements:
 impl Instance {
     pub async fn post_chat_completions(
         &self,
-        link_words: Vec<String>,
-        avoid_words: Vec<String>,
+        link_words: &[String],
+        avoid_words: &[String],
     ) -> Result<ChatCompletionsResponse, Box<dyn std::error::Error>> {
         let request_body = self.build_request_body(link_words, avoid_words);
 
@@ -48,8 +47,8 @@ impl Instance {
 
     fn build_request_body(
         &self,
-        link_words: Vec<String>,
-        avoid_words: Vec<String>,
+        link_words: &[String],
+        avoid_words: &[String],
     ) -> serde_json::Value {
         // Aggregate two sets of words into one prompt
         let content = format!(
