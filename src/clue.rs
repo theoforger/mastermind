@@ -96,6 +96,9 @@ impl ClueCollection {
                 Cell::new("Linked Words")
                     .add_attribute(Attribute::Bold)
                     .set_alignment(CellAlignment::Center),
+                Cell::new("Source")
+                    .add_attribute(Attribute::Bold)
+                    .set_alignment(CellAlignment::Center)
             ])
             .set_content_arrangement(ContentArrangement::Dynamic)
             .load_preset(UTF8_FULL)
@@ -107,13 +110,14 @@ impl ClueCollection {
                 clue.clue_word.clone(),
                 clue.count.to_string(),
                 clue.linked_words.join(", "),
+                clue.source.clone()
             ]);
         }
 
         // Center the second column
         let second_column = table
             .column_mut(1)
-            .expect("The table should have three columns");
+            .expect("The table should have more than 2 columns");
         second_column.set_cell_alignment(CellAlignment::Center);
 
         table.to_string()
