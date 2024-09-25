@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let link_words = read_words_from_file(args.to_link.unwrap())?;
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
-    // If -m is present and has values, use preferred language models
+    // If -m is present and has values, use the preferred language models
     // If -m is present but doesn't have a value, prompt interactive menu
     // If -m is not present, use the default from environment variable
     let selected_model_ids = match args.models {
@@ -43,9 +43,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .map_err(|_| "Cannot read environment variable: DEFAULT_MODEL_ID")?],
     };
 
-    // Get responses and build ClueCollection
+    // Aggregate responses from each language model and build ClueCollection
     let mut responses: Vec<ChatCompletionsResponse> = vec![];
     for model_id in &selected_model_ids {
+        api_instance.validate_model_id(model_id).await?;
         let response = api_instance
             .post_chat_completions(&link_words, &avoid_words, model_id)
             .await?;

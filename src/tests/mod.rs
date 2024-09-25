@@ -2,6 +2,7 @@ use super::*;
 use crate::api::Instance;
 use httpmock::prelude::*;
 use crate::clue::ClueCollection;
+use crate::model_collection::ModelCollection;
 
 #[test]
 fn test_api_instance() {
@@ -35,11 +36,11 @@ async fn test_get_models() {
     api_instance.set_base_url(server.url("/"));
 
     // Get response from mock server
-    let response = api_instance.get_models().await.unwrap();
+    let response = ModelCollection::new(api_instance.get_models().await.unwrap());
     mock.assert();
 
     // Compare outputs
-    let output = response.join("\n");
+    let output = response.generate_string();
     let expected_output = fs::read_to_string("src/tests/expected_outputs/language_models.txt").unwrap();
     assert_eq!(output, expected_output);
 }
@@ -63,7 +64,7 @@ async fn test_post_chat_completions() {
 
     // Get responses from mock server
     let responses = vec![api_instance
-        .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new())
+        .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new(),&String::new())
         .await
         .unwrap()];
     mock.assert();

@@ -27,7 +27,6 @@ impl Instance {
         avoid_words: &[String],
         model_id: &String,
     ) -> Result<ChatCompletionsResponse, Box<dyn std::error::Error>> {
-        self.validate_model_id(model_id).await?;
         let request_body = self.build_request_body(link_words, avoid_words, model_id);
 
         // Get response from API endpoint
@@ -46,6 +45,22 @@ impl Instance {
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
 
         Ok(parsed_response)
+    }
+
+    pub async fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
+        let models_response = self.get_models().await?;
+        let model_collection = ModelCollection::new(models_response);
+
+        // Return Error if the chosen model is not valid
+        if !model_collection.contains(model_id) {
+            return Err(format!(
+                "{} is not a valid language model from your provider",
+                model_id
+            )
+                .into());
+        }
+
+        Ok(())
     }
 
     fn build_request_body(
@@ -74,21 +89,5 @@ impl Instance {
             ],
             "model": model_id
         })
-    }
-
-    async fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
-        let models_response = self.get_models().await?;
-        let model_collection = ModelCollection::new(models_response);
-
-        // Return Error if the chosen model is not valid
-        if !model_collection.contains(model_id) {
-            return Err(format!(
-                "{} is not a valid language model from your provider",
-                model_id
-            )
-            .into());
-        }
-
-        Ok(())
     }
 }
