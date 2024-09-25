@@ -12,9 +12,9 @@ fn test_api_instance() {
 
 #[test]
 fn test_read_words_from_file() {
-    let to_link = read_words_from_file(PathBuf::from("examples/link.txt"));
+    let to_link = read_words_from_file(&PathBuf::from("examples/link.txt"));
     assert!(to_link.is_ok());
-    let to_avoid = read_words_from_file(PathBuf::from("examples/avoid.txt"));
+    let to_avoid = read_words_from_file(&PathBuf::from("examples/avoid.txt"));
     assert!(to_avoid.is_ok());
 }
 
