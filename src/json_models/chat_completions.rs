@@ -19,6 +19,7 @@ pub struct Usage {
 
 #[derive(Deserialize)]
 pub struct ChatCompletionsResponse {
-    pub choices: Vec<Choice>,
+    pub model: String,
     pub usage: Usage,
+    pub choices: Vec<Choice>,
 }
