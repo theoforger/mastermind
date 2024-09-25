@@ -1,5 +1,6 @@
 use super::Instance;
 use crate::json_models::chat_completions::ChatCompletionsResponse;
+use crate::model_collection::ModelCollection;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"
@@ -24,8 +25,10 @@ impl Instance {
         &self,
         link_words: &[String],
         avoid_words: &[String],
+        model_id: &String,
     ) -> Result<ChatCompletionsResponse, Box<dyn std::error::Error>> {
-        let request_body = self.build_request_body(link_words, avoid_words);
+        self.validate_model_id(model_id).await?;
+        let request_body = self.build_request_body(link_words, avoid_words, model_id);
 
         // Get response from API endpoint
         let response = self
@@ -41,7 +44,7 @@ impl Instance {
             .json::<ChatCompletionsResponse>()
             .await
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
-        
+
         Ok(parsed_response)
     }
 
@@ -49,6 +52,7 @@ impl Instance {
         &self,
         link_words: &[String],
         avoid_words: &[String],
+        model_id: &String,
     ) -> serde_json::Value {
         // Aggregate two sets of words into one prompt
         let content = format!(
@@ -68,7 +72,23 @@ impl Instance {
                     "content": content
                 }
             ],
-            "model": self.model_id
+            "model": model_id
         })
+    }
+
+    async fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
+        let models_response = self.get_models().await?;
+        let model_collection = ModelCollection::new(models_response);
+
+        // Return Error if the chosen model is not valid
+        if !model_collection.contains(model_id) {
+            return Err(format!(
+                "{} is not a valid language model from your provider",
+                model_id
+            )
+            .into());
+        }
+
+        Ok(())
     }
 }

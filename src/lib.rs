@@ -19,7 +19,7 @@ pub struct Args {
 
     /// Select language model(s)
     #[arg(short, long = "set-models", default_missing_value = "interactive", num_args = 0..)]
-    pub model: Option<Vec<String>>,
+    pub models: Option<Vec<String>>,
 
     /// Specify an output file
     #[arg(short, long, value_name = "FILE")]

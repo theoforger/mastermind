@@ -1,4 +1,3 @@
-use std::env;
 use clap::Parser;
 use dotenv::dotenv;
 use mastermind::api::Instance;
@@ -6,6 +5,7 @@ use mastermind::clue::ClueCollection;
 use mastermind::json_models::chat_completions::ChatCompletionsResponse;
 use mastermind::model_collection::ModelCollection;
 use mastermind::*;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
 
     // Create an API instance and get all available models
-    let mut api_instance = Instance::new()?;
+    let api_instance = Instance::new()?;
     let models_response = api_instance.get_models().await?;
     let model_collection = ModelCollection::new(models_response);
 
@@ -24,45 +24,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // If -m is set, use a preferred language model
-    if let Some(model_ids) = args.model {
-        if model_ids[0] == "interactive" {
-            let selected_model = model_collection.prompt_selection()[0].to_string();
-            api_instance.set_model_id(selected_model).await?;
-        } else {
-            let selected_model = env::var("DEFAULT_MODEL_ID")
-                .map_err(|_| "Cannot read environment variable: DEFAULT_MODEL_ID".into())?;
-            api_instance.set_model_id(selected_model).await?;
-        }
-    }
-
-    // Attempt to read words from the two files
+    // Read words from the two files
     let link_words = read_words_from_file(args.to_link.unwrap())?;
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
-    // Get responses
-    // If -m is set, use a preferred language model(s)
-    // Otherwise, call the API straight away
-    let responses = match args.model {
+    // If -m is present and has values, use preferred language models
+    // If -m is present but doesn't have a value, prompt interactive menu
+    // If -m is not present, use the default from environment variable
+    let selected_model_ids = match args.models {
         Some(model_ids) => {
-            let mut responses: Vec<ChatCompletionsResponse> = vec![];
-            for model_id in model_ids {
-                api_instance.set_model_id(model_id).await?;
-                let response = api_instance
-                    .post_chat_completions(&link_words, &avoid_words)
-                    .await?;
-                responses.push(response);
+            if model_ids[0] == "interactive" {
+                model_collection.prompt_selection()
+            } else {
+                model_ids
             }
-            responses
         }
-        None => vec![
-            api_instance
-                .post_chat_completions(&link_words, &avoid_words)
-                .await?,
-        ],
+        None => vec![env::var("DEFAULT_MODEL_ID")
+            .map_err(|_| "Cannot read environment variable: DEFAULT_MODEL_ID")?],
     };
 
-    // Build ClueCollection from the responses
+    // Get responses and build ClueCollection
+    let mut responses: Vec<ChatCompletionsResponse> = vec![];
+    for model_id in &selected_model_ids {
+        let response = api_instance
+            .post_chat_completions(&link_words, &avoid_words, model_id)
+            .await?;
+        responses.push(response);
+    }
     let clue_collection = ClueCollection::new(responses);
 
     // Output
