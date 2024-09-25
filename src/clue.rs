@@ -24,16 +24,28 @@ impl Clue {
             return None;
         }
 
-        let clue_word = chunks[0].to_string();
+        let clue_word = chunks[0].trim().to_string();
+
         let count = match chunks[1].parse::<usize>() {
             Ok(count) => count,
             Err(_) => return None,
         };
-        let linked_words: Vec<String> = chunks[2..].iter().map(|&s| s.to_string()).collect();
 
-        // Verify the clue
+        let linked_words: Vec<String> = chunks[2..].iter().map(|&s| s.trim().to_string()).collect();
+
+        // Discard clue if count and the actual number don't line up
         if linked_words.len() != count {
             return None;
+        }
+
+        // Discard clues that contains special characters (likely due to hallucination)
+        if !clue_word.chars().all(|c| c.is_alphabetic() || c == ' ') {
+            return None;
+        }
+        for word in &linked_words {
+            if !word.chars().all(|c| c.is_alphabetic() || c == ' ') {
+                return None;
+            }
         }
 
         Some(Self {
@@ -60,7 +72,7 @@ impl ClueCollection {
         for response in responses {
             for choice in response.choices {
                 for line in choice.message.content.lines() {
-                    if let Some(clue) = Clue::new(line, response.model.clone()) {
+                    if let Some(clue) = Clue::new(line.trim(), response.model.clone()) {
                         clues.push(clue);
                     }
                 }
