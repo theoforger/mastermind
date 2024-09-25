@@ -7,6 +7,7 @@ mod clue;
 mod json_models;
 #[cfg(test)]
 mod tests;
+mod model_collection;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
