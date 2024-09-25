@@ -1,6 +1,5 @@
 use super::Instance;
 use crate::json_models::chat_completions::ChatCompletionsResponse;
-use crate::model_collection::ModelCollection;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"
@@ -45,22 +44,6 @@ impl Instance {
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
 
         Ok(parsed_response)
-    }
-
-    pub async fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
-        let models_response = self.get_models().await?;
-        let model_collection = ModelCollection::new(models_response);
-
-        // Return Error if the chosen model is not valid
-        if !model_collection.contains(model_id) {
-            return Err(format!(
-                "{} is not a valid language model from your provider",
-                model_id
-            )
-                .into());
-        }
-
-        Ok(())
     }
 
     fn build_request_body(

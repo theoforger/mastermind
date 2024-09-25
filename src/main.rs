@@ -4,7 +4,6 @@ use std::env;
 
 use mastermind::api::Instance;
 use mastermind::clue::ClueCollection;
-use mastermind::json_models::chat_completions::ChatCompletionsResponse;
 use mastermind::model_collection::ModelCollection;
 use mastermind::*;
 
@@ -45,9 +44,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Aggregate responses from each language model and build ClueCollection
-    let mut responses: Vec<ChatCompletionsResponse> = vec![];
+    let mut responses = vec![];
     for model_id in &selected_model_ids {
-        api_instance.validate_model_id(model_id).await?;
+        model_collection.validate_model_id(model_id)?;
         let response = api_instance
             .post_chat_completions(&link_words, &avoid_words, model_id)
             .await?;

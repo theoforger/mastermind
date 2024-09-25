@@ -41,7 +41,15 @@ impl ModelCollection {
         println!("{}", self.generate_list());
     }
 
-    pub fn contains(&self, model_id: &String) -> bool {
-        self.model_ids.contains(model_id)
+    pub fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
+        if !self.model_ids.contains(model_id) {
+            return Err(format!(
+                "{} is not a valid language model from your provider",
+                model_id
+            )
+            .into());
+        }
+
+        Ok(())
     }
 }
