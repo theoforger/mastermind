@@ -38,8 +38,8 @@ pub struct Args {
     pub to_avoid: Option<PathBuf>,
 }
 
-pub fn read_words_from_file(path: PathBuf) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let contents = fs::read_to_string(&path)
+pub fn read_words_from_file(path: &PathBuf) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(path)
         .map_err(|_| format!("Cannot find file: {}", path.to_string_lossy()))?;
 
     let words: Vec<String> = contents
@@ -56,16 +56,16 @@ pub fn read_words_from_file(path: PathBuf) -> Result<Vec<String>, Box<dyn std::e
 }
 
 pub fn write_content_to_file(
-    path: PathBuf,
+    path: &PathBuf,
     content: String,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if let Ok(existing_content) = fs::read_to_string(&path) {
+    if let Ok(existing_content) = fs::read_to_string(path) {
         if !existing_content.is_empty() {
             return Err(format!("File is not empty: {}", path.to_string_lossy()).into());
         }
     }
 
-    fs::write(&path, content)
+    fs::write(path, content)
         .map_err(|_| format!("Failed to write to file: {}", path.to_string_lossy()))?;
 
     Ok(())
