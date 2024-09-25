@@ -1,6 +1,6 @@
 use super::Instance;
 use crate::clue::ClueCollection;
-use crate::json_models::chat_completion::ChatCompletionResponse;
+use crate::json_models::chat_completions::ChatCompletionsResponse;
 use serde_json::json;
 
 const SYSTEM_PROMPT: &str = r#"
@@ -21,7 +21,7 @@ Here are the requirements:
 "#;
 
 impl Instance {
-    pub async fn fetch_clue_collection(
+    pub async fn post_chat_completions(
         &self,
         link_words: Vec<String>,
         avoid_words: Vec<String>,
@@ -39,7 +39,7 @@ impl Instance {
             .map_err(|e| format!("Failed to fetch clue collection from API server: {}", e))?;
 
         let parsed_response = response
-            .json::<ChatCompletionResponse>()
+            .json::<ChatCompletionsResponse>()
             .await
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
 

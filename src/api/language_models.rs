@@ -1,8 +1,8 @@
 use super::Instance;
-use crate::json_models::language_model::ModelsResponse;
+use crate::json_models::language_models::ModelsResponse;
 
 impl Instance {
-    pub async fn fetch_language_model_ids(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    pub async fn get_models(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let response = self
             .client
             .get(format!("{}models", self.base_url))

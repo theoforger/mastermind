@@ -42,7 +42,7 @@ impl Instance {
         model_id: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Return Error if the chosen model is not valid
-        let valid_model_ids = self.fetch_language_model_ids().await?;
+        let valid_model_ids = self.get_models().await?;
         if !valid_model_ids.contains(&model_id) {
             return Err(format!(
                 "{} is not a valid language model from your provider",

@@ -18,7 +18,7 @@ pub struct Usage {
 }
 
 #[derive(Deserialize)]
-pub struct ChatCompletionResponse {
+pub struct ChatCompletionsResponse {
     pub choices: Vec<Choice>,
     pub usage: Usage,
 }

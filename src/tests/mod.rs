@@ -17,7 +17,7 @@ fn test_read_words_from_file() {
 }
 
 #[tokio::test]
-async fn test_fetch_language_models() {
+async fn test_get_models() {
     // Start a lightweight mock server.
     let server = MockServer::start_async().await;
 
@@ -34,7 +34,7 @@ async fn test_fetch_language_models() {
     api_instance.set_base_url(server.url("/"));
 
     // Get response from mock server
-    let response = api_instance.fetch_language_model_ids().await.unwrap();
+    let response = api_instance.get_models().await.unwrap();
     mock.assert();
 
     // Compare outputs
@@ -44,7 +44,7 @@ async fn test_fetch_language_models() {
 }
 
 #[tokio::test]
-async fn test_fetch_clue_collection() {
+async fn test_post_chat_completions() {
     // Start a lightweight mock server.
     let server = MockServer::start_async().await;
 
@@ -62,7 +62,7 @@ async fn test_fetch_clue_collection() {
 
     // Get response from mock server
     let response = api_instance
-        .fetch_clue_collection(vec![], vec![])
+        .post_chat_completions(vec![], vec![])
         .await
         .unwrap();
     mock.assert();

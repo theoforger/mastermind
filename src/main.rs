@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // If -g is set, call the models API endpoint instead
     if args.get {
-        println!("{}", api_instance.fetch_language_model_ids().await?.join("\n"));
+        println!("{}", api_instance.get_models().await?.join("\n"));
         return Ok(());
     }
 
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get clues from API
     let clue_collection = api_instance
-        .fetch_clue_collection(link_words, avoid_words)
+        .post_chat_completions(link_words, avoid_words)
         .await?;
 
     // Output
