@@ -1,6 +1,7 @@
 use super::*;
 use crate::api::Instance;
 use httpmock::prelude::*;
+use crate::clue::ClueCollection;
 
 #[test]
 fn test_api_instance() {
@@ -60,15 +61,15 @@ async fn test_post_chat_completions() {
     let mut api_instance = Instance::new().unwrap();
     api_instance.set_base_url(server.url("/"));
 
-    // Get response from mock server
-    let response = api_instance
-        .post_chat_completions(vec![], vec![])
+    // Get responses from mock server
+    let responses = vec![api_instance
+        .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new())
         .await
-        .unwrap();
+        .unwrap()];
     mock.assert();
 
     // Compare outputs
-    let output = response.generate_raw_list();
+    let output = ClueCollection::new(responses).generate_raw_list();
     let expected_output =
         fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
     assert_eq!(output, expected_output);
