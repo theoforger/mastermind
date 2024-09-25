@@ -25,7 +25,7 @@ impl Instance {
         &self,
         link_words: Vec<String>,
         avoid_words: Vec<String>,
-    ) -> Result<ClueCollection, Box<dyn std::error::Error>> {
+    ) -> Result<ChatCompletionsResponse, Box<dyn std::error::Error>> {
         let request_body = self.build_request_body(link_words, avoid_words);
 
         // Get response from API endpoint
@@ -42,11 +42,8 @@ impl Instance {
             .json::<ChatCompletionsResponse>()
             .await
             .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
-
-        // Build clues
-        let clue_collection = ClueCollection::new(clue_strings, token_usage);
-
-        Ok(clue_collection)
+        
+        Ok(parsed_response)
     }
 
     fn build_request_body(

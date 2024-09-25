@@ -2,6 +2,7 @@ use clap::Parser;
 
 use mastermind::api::Instance;
 use mastermind::*;
+use mastermind::clue::ClueCollection;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -27,9 +28,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let avoid_words = read_words_from_file(args.to_avoid.unwrap())?;
 
     // Get clues from API
-    let clue_collection = api_instance
-        .post_chat_completions(link_words, avoid_words)
-        .await?;
+    let responses = 
+    let clue_collection = ClueCollection::new(responses)
 
     // Output
     if clue_collection.is_empty() {

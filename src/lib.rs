@@ -3,7 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 
 pub mod api;
-mod clue;
+pub mod clue;
 mod json_models;
 #[cfg(test)]
 mod tests;
