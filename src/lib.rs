@@ -5,6 +5,7 @@ use std::path::PathBuf;
 pub mod api;
 pub mod clue;
 pub mod json_models;
+pub mod model_collection;
 #[cfg(test)]
 mod tests;
 
@@ -17,7 +18,7 @@ pub struct Args {
     pub get: bool,
 
     /// Select language model(s)
-    #[arg(short, long = "set-models", num_args = 1..)]
+    #[arg(short, long = "set-models", default_missing_value = "interactive", num_args = 0..)]
     pub model: Option<Vec<String>>,
 
     /// Specify an output file
