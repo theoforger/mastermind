@@ -2,10 +2,10 @@ use clap::Parser;
 use dotenv::dotenv;
 use std::env;
 
-use mastermind::api::Instance;
-use mastermind::clue::ClueCollection;
-use mastermind::model::ModelCollection;
 use mastermind::*;
+
+use clue::ClueCollection;
+use model::ModelCollection;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
 
     // Create an API instance and get all available models
-    let api_instance = Instance::new()?;
+    let api_instance = api::Instance::new()?;
     let models_response = api_instance.get_models().await?;
     let model_collection = ModelCollection::new(models_response);
 

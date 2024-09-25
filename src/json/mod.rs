@@ -1,2 +1,2 @@
-pub mod chat_completions;
-pub mod models;
+pub(crate) mod chat_completions;
+pub(crate) mod models;
