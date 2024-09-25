@@ -20,7 +20,7 @@ impl ModelCollection {
 
     pub fn prompt_selection(&self) -> Vec<String> {
         let chosen_indexes = MultiSelect::new()
-            .with_prompt("What do you choose?")
+            .with_prompt("Choose language model(s)\n[Space] to select, [Enter] to confirm")
             .items(&self.model_ids)
             .interact()
             .unwrap();
