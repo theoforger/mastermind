@@ -17,7 +17,7 @@ pub struct Args {
     pub get: bool,
 
     /// Select language model(s)
-    #[arg(short, long = "set-model", num_args = 1..)]
+    #[arg(short, long = "set-models", num_args = 1..)]
     pub model: Option<Vec<String>>,
 
     /// Specify an output file
