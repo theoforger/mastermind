@@ -2,7 +2,6 @@ use crate::json::chat_completions::{ChatCompletionsResponse, Usage};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
-use std::fmt::{Debug, Display};
 
 struct Clue {
     clue_word: String,
@@ -95,20 +94,6 @@ impl ClueCollection {
         self.clues.is_empty()
     }
 
-    fn generate_list(&self) -> String {
-        let mut list = String::new();
-        for clue in &self.clues {
-            let clue_string = format!(
-                "{} {} - {}\n",
-                clue.clue_word,
-                clue.count,
-                clue.linked_words.join(", ")
-            );
-            list.push_str(clue_string.as_str());
-        }
-        list
-    }
-
     fn generate_table(&self) -> Table {
         let mut table = Table::new();
 
@@ -164,14 +149,25 @@ impl ClueCollection {
     }
 }
 
-impl Display for ClueCollection {
+impl std::fmt::Display for ClueCollection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.generate_table())
     }
 }
 
-impl Debug for ClueCollection {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.generate_list())
+#[cfg(test)]
+impl ClueCollection {
+    pub fn generate_list(&self) -> String {
+        let mut list = String::new();
+        for clue in &self.clues {
+            let clue_string = format!(
+                "{} {} - {}\n",
+                clue.clue_word,
+                clue.count,
+                clue.linked_words.join(", ")
+            );
+            list.push_str(clue_string.as_str());
+        }
+        list
     }
 }

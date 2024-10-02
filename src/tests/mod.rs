@@ -33,7 +33,7 @@ async fn test_get_models() {
 
     // Create an API instance and set the base url to mock server url
     let mut api_instance = Instance::new().unwrap();
-    api_instance.base_url = server.url("/");
+    api_instance.set_base_url(server.url("/"));
 
     // Get response from mock server
     let response = ModelCollection::new(api_instance.get_models().await.unwrap());
@@ -60,7 +60,7 @@ async fn test_post_chat_completions() {
 
     // Create an API instance and set the base url to mock server url
     let mut api_instance = Instance::new().unwrap();
-    api_instance.base_url = server.url("/");
+    api_instance.set_base_url(server.url("/"));
 
     // Get responses from mock server
     let responses = vec![api_instance
@@ -70,7 +70,7 @@ async fn test_post_chat_completions() {
     mock.assert();
 
     // Compare outputs
-    let output = format!("{:?}", ClueCollection::new(responses));
+    let output = ClueCollection::new(responses).generate_list();
     let expected_output =
         fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
     assert_eq!(output, expected_output);

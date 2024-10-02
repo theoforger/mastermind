@@ -6,7 +6,7 @@ use std::env;
 
 pub struct Instance {
     client: reqwest::Client,
-    pub base_url: String,
+    base_url: String,
     key: String,
 }
 
@@ -32,5 +32,12 @@ impl Instance {
     fn get_env_var(var_name: &str) -> Result<String, Box<dyn std::error::Error>> {
         env::var(var_name)
             .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
+    }
+}
+
+#[cfg(test)]
+impl Instance {
+    pub(crate) fn set_base_url(&mut self, base_url: String) {
+        self.base_url = base_url;
     }
 }
