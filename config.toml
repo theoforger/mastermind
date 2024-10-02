@@ -3,6 +3,6 @@
 # baseURL
 # model
 [api]
-key = "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"
+key = "your-api-key"
 base = "https://api.groq.com/openai/v1/"
 model = "llama-3.1-70b-versatile"
