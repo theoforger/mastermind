@@ -1,8 +1,10 @@
 mod chat_completions;
 mod models;
 
-use dotenv::dotenv;
-use std::env;
+// use std::env;
+use crate::config;
+
+use config::ConfigError;
 
 pub struct Instance {
     client: reqwest::Client,
@@ -11,16 +13,30 @@ pub struct Instance {
 }
 
 impl Instance {
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        dotenv().ok();
+    pub fn new() -> Result<Self, ConfigError> {
 
-        let base_url = Self::get_env_var("OPENAI_API_BASE_URL")?;
+        let config = config::Config::from_file("config.toml")?;
+
+        let base_url = match config.get_base_url() {
+            Some(url) => url.to_string(),
+            None=> {
+                eprintln!("Base URL not found in configuration.");
+                return Err(ConfigError::ParseError("Base URL not found".to_string()));
+            }
+        };
+
         let base_url = if !base_url.ends_with('/') {
             format!("{}/", base_url)
         } else {
             base_url
         };
-        let key = Self::get_env_var("API_KEY")?;
+        let key = match config.get_api_key(){
+            Some(key) => key.to_string(),
+            None => {
+                eprintln!("API key not found in configuration.");
+                return Err(ConfigError::ParseError("API key not found".to_string()));
+            }
+        };
 
         Ok(Self {
             client: reqwest::Client::new(),
@@ -29,10 +45,11 @@ impl Instance {
         })
     }
 
-    fn get_env_var(var_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-        env::var(var_name)
-            .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
-    }
+    // Commented as never used
+    // fn get_env_var(var_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+    //     env::var(var_name)
+    //         .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
+    // }
 
     pub fn set_base_url(&mut self, base_url: String) {
         self.base_url = base_url;
