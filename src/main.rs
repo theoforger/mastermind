@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // If -g is set, display models and exit the program
     if args.get {
-        model_collection.display_list();
+        println!("{model_collection}");
         return Ok(());
     }
 
@@ -91,9 +91,9 @@ fn handle_output(args: &Args, clue_collection: ClueCollection) -> Result<(), Box
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else if let Some(output_path) = &args.output {
         println!("Writing to file '{}'...", output_path.display());
-        write_content_to_file(output_path, clue_collection.generate_table())?;
+        write_content_to_file(output_path, clue_collection.to_string())?;
     } else {
-        clue_collection.display_table();
+        println!("{clue_collection}");
     }
 
     // If -t is set, output token usage information
