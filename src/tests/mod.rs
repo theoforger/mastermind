@@ -70,7 +70,7 @@ async fn test_post_chat_completions() {
     mock.assert();
 
     // Compare outputs
-    let output = ClueCollection::new(responses).to_string();
+    let output = format!("{:?}", ClueCollection::new(responses));
     let expected_output =
         fs::read_to_string("src/tests/expected_outputs/chat_completions.txt").unwrap();
     assert_eq!(output, expected_output);
