@@ -9,8 +9,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   API_KEY: ""
-  OPENAI_API_BASE_URL: "https://api.groq.com/openai/v1/"
-  DEFAULT_MODEL_ID: "llama-3.1-70b-versatile"
+  OPENAI_API_BASE_URL: ""
+  DEFAULT_MODEL_ID: ""
 
 jobs:
   build:
@@ -27,3 +27,5 @@ jobs:
       run: cargo run -- -h
     - name: Run unit testing
       run: cargo test
+    - name: Run linting test
+      run: cargo fmt --check

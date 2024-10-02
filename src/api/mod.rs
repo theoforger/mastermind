@@ -14,12 +14,11 @@ pub struct Instance {
 
 impl Instance {
     pub fn new() -> Result<Self, ConfigError> {
-
         let config = config::Config::from_file("config.toml")?;
 
         let base_url = match config.get_base_url() {
             Some(url) => url.to_string(),
-            None=> {
+            None => {
                 eprintln!("Base URL not found in configuration.");
                 return Err(ConfigError::ParseError("Base URL not found".to_string()));
             }
@@ -30,7 +29,7 @@ impl Instance {
         } else {
             base_url
         };
-        let key = match config.get_api_key(){
+        let key = match config.get_api_key() {
             Some(key) => key.to_string(),
             None => {
                 eprintln!("API key not found in configuration.");
@@ -50,8 +49,15 @@ impl Instance {
     //     env::var(var_name)
     //         .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
     // }
+    // fn get_env_var(var_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+    //     env::var(var_name)
+    //         .map_err(|_| format!("Cannot read environment variable: {}", var_name).into())
+    // }
+}
 
-    pub fn set_base_url(&mut self, base_url: String) {
+#[cfg(test)]
+impl Instance {
+    pub(crate) fn set_base_url(&mut self, base_url: String) {
         self.base_url = base_url;
     }
 }

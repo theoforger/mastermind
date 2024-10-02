@@ -1,5 +1,6 @@
 use crate::json::models::ModelsResponse;
 use dialoguer::MultiSelect;
+use std::fmt::{Display, Formatter};
 
 pub struct ModelCollection {
     model_ids: Vec<String>,
@@ -33,14 +34,6 @@ impl ModelCollection {
         chosen_model_ids
     }
 
-    pub fn generate_list(&self) -> String {
-        self.model_ids.join("\n")
-    }
-
-    pub fn display_list(&self) {
-        println!("{}", self.generate_list());
-    }
-
     pub fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
         if !self.model_ids.contains(model_id) {
             return Err(format!(
@@ -51,5 +44,11 @@ impl ModelCollection {
         }
 
         Ok(())
+    }
+}
+
+impl Display for ModelCollection {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.model_ids.join("\n"))
     }
 }

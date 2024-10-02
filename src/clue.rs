@@ -2,6 +2,7 @@ use crate::json::chat_completions::{ChatCompletionsResponse, Usage};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
+
 struct Clue {
     clue_word: String,
     count: usize,
@@ -93,21 +94,7 @@ impl ClueCollection {
         self.clues.is_empty()
     }
 
-    pub fn generate_list(&self) -> String {
-        let mut list = String::new();
-        for clue in &self.clues {
-            let clue_string = format!(
-                "{} {} - {}\n",
-                clue.clue_word,
-                clue.count,
-                clue.linked_words.join(", ")
-            );
-            list.push_str(clue_string.as_str());
-        }
-        list
-    }
-
-    pub fn generate_table(&self) -> String {
+    fn generate_table(&self) -> Table {
         let mut table = Table::new();
 
         // Set up header and styles
@@ -146,15 +133,7 @@ impl ClueCollection {
             .expect("The table should have more than 2 columns");
         second_column.set_cell_alignment(CellAlignment::Center);
 
-        table.to_string()
-    }
-
-    pub fn display_list(&self) {
-        println!("{}", self.generate_list());
-    }
-
-    pub fn display_table(&self) {
-        println!("{}", self.generate_table());
+        table
     }
 
     pub fn display_token_info(&self) {
@@ -167,5 +146,28 @@ impl ClueCollection {
             Total Tokens: {}",
             self.usage.prompt_tokens, self.usage.completion_tokens, self.usage.total_tokens
         );
+    }
+}
+
+impl std::fmt::Display for ClueCollection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.generate_table())
+    }
+}
+
+#[cfg(test)]
+impl ClueCollection {
+    pub fn generate_list(&self) -> String {
+        let mut list = String::new();
+        for clue in &self.clues {
+            let clue_string = format!(
+                "{} {} - {}\n",
+                clue.clue_word,
+                clue.count,
+                clue.linked_words.join(", ")
+            );
+            list.push_str(clue_string.as_str());
+        }
+        list
     }
 }

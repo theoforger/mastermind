@@ -40,7 +40,7 @@ async fn test_get_models() {
     mock.assert();
 
     // Compare outputs
-    let output = response.generate_list();
+    let output = response.to_string();
     let expected_output = fs::read_to_string("src/tests/expected_outputs/models.txt").unwrap();
     assert_eq!(output, expected_output);
 }
