@@ -8,6 +8,7 @@ mod json;
 pub mod model;
 #[cfg(test)]
 mod tests;
+pub mod config;
 
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
