@@ -15,6 +15,9 @@ pub struct Instance {
 impl Instance {
     pub fn new() -> Result<Self, ConfigError> {
         let config = config::Config::from_file("config.toml")?;
+        //dotenv().ok();
+
+        //let base_url = Self::get_env_var("OPENAI_API_BASE_URL")?;
 
         let base_url = match config.get_base_url() {
             Some(url) => url.to_string(),
@@ -29,6 +32,8 @@ impl Instance {
         } else {
             base_url
         };
+
+        // let key = Self::get_env_var("API_KEY")?;
         let key = match config.get_api_key() {
             Some(key) => key.to_string(),
             None => {
