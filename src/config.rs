@@ -1,9 +1,10 @@
 use std::error::Error;
-use std::fmt;
+use std::{env, fmt};
 use std::fs;
 use std::io;
-use std::path::Path;
+use dotenv::dotenv;
 use toml_edit::{value, Document};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub enum ConfigError {
@@ -14,6 +15,7 @@ pub enum ConfigError {
 
 pub struct Config {
     pub document: Document,
+    pub path: PathBuf,
 }
 
 impl fmt::Display for ConfigError {
@@ -45,10 +47,44 @@ impl From<toml_edit::TomlError> for ConfigError {
 }
 
 impl Config {
+
+    pub fn new() -> Result<Self, ConfigError> {
+        dotenv().ok();
+
+        // Get the user's home directory
+        let home_dir = dirs::home_dir()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Home directory not found"))?;
+
+        // Define the config file path
+        let config_path = home_dir.join("mastermind-sample-mindmaster-config.toml");
+
+        let document = if !config_path.exists() {
+            // Create a new Document
+            let mut doc = Document::new();
+
+            // Set values from environment variables or use defaults
+            let base_url = env::var("OPENAI_API_BASE_URL").unwrap_or_else(|_| "https://api.groq.com/openai/v1/".to_string());
+            doc["api"]["base"] = value(base_url);
+
+            let api_key = env::var("API_KEY").unwrap_or_else(|_| "your-api-key".to_string());
+            doc["api"]["key"] = value(api_key);
+
+            // Write the document to the config file
+            fs::write(&config_path, doc.to_string())?;
+
+            doc
+        } else {
+            // If the file exists, load it
+            let config_str = fs::read_to_string(&config_path)?;
+            config_str.parse::<Document>()?
+        };
+
+        Ok(Config { document, path: config_path })
+    }
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ConfigError> {
         let config_str = fs::read_to_string(&path)?;
         let document = config_str.parse::<Document>()?;
-        Ok(Config { document })
+        Ok(Config { document, path: path.as_ref().to_path_buf() })
     }
 
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), ConfigError> {
