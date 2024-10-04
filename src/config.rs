@@ -55,7 +55,7 @@ impl Config {
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Home directory not found"))?;
 
         // Define the config file path
-        let config_path = home_dir.join(".mastermind-sample-mindmaster-config.toml");
+        let config_path = home_dir.join(".mastermind-config.toml");
 
         let document = if !config_path.exists() {
             // Create a new Document
