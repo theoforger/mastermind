@@ -3,18 +3,18 @@ use std::error::Error;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::{env, fmt};
-use toml_edit::{value, Document};
+use std::fmt;
+use toml_edit::{value, DocumentMut, Item};
 
 #[derive(Debug)]
 pub enum ConfigError {
     FileNotFound(String),
     ParseError(String),
-    IoError(io::Error),
+    IoError(String),
 }
 
 pub struct Config {
-    pub document: Document,
+    pub document: DocumentMut,
     pub path: PathBuf,
 }
 
@@ -35,7 +35,7 @@ impl From<io::Error> for ConfigError {
         if err.kind() == io::ErrorKind::NotFound {
             ConfigError::FileNotFound(err.to_string())
         } else {
-            ConfigError::IoError(err)
+            ConfigError::IoError(err.to_string())
         }
     }
 }
@@ -51,42 +51,51 @@ impl Config {
         dotenv().ok();
 
         // Get the user's home directory
-        let home_dir = dirs::home_dir()
-            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Home directory not found"))?;
+        let config_dir = dirs::config_dir().unwrap().to_path_buf();
 
-        // Define the config file path
-        let config_path = home_dir.join(".mastermind-config.toml");
+        // Define the config folder
+        let master_mind_folder = config_dir.join("mastermind");
+        match fs::create_dir_all(&master_mind_folder) {
+            Ok(_) => println!("Folder created successfully at {:?}", master_mind_folder),
+            Err(e) => eprintln!("Failed to create folder: {}", e),
+        }
 
-        let document = if !config_path.exists() {
+        // Define config file path
+        let config_file = master_mind_folder.join(".config.toml");
+
+        // Debug, left, in case you are having hard time finding a file
+        // println!("config_file path is : {:?}", config_file);
+
+        // If the file doesn't exist
+        let document = if !config_file.exists() {
             // Create a new Document
-            let mut doc = Document::new();
+            let mut doc = DocumentMut::new();
 
-            // Set values from environment variables or use defaults
-            let base_url = env::var("OPENAI_API_BASE_URL")
-                .unwrap_or_else(|_| "https://api.groq.com/openai/v1/".to_string());
-            doc["api"]["base"] = value(base_url);
+            // Make .toml file in table-like format
+            doc["api"] = Item::Table(Default::default());
 
-            let api_key = env::var("API_KEY").unwrap_or_else(|_| "your-api-key".to_string());
-            doc["api"]["key"] = value(api_key);
+            doc["api"]["base"] = value("");
+            doc["api"]["key"] = value("");
+
 
             // Write the document to the config file
-            fs::write(&config_path, doc.to_string())?;
+            fs::write(&config_file, doc.to_string())?;
 
             doc
         } else {
             // If the file exists, load it
-            let config_str = fs::read_to_string(&config_path)?;
-            config_str.parse::<Document>()?
+            let config_str = fs::read_to_string(&config_file)?;
+            config_str.parse::<DocumentMut>()?
         };
 
         Ok(Config {
             document,
-            path: config_path,
+            path: config_file,
         })
     }
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ConfigError> {
         let config_str = fs::read_to_string(&path)?;
-        let document = config_str.parse::<Document>()?;
+        let document = config_str.parse::<DocumentMut>()?;
         Ok(Config {
             document,
             path: path.as_ref().to_path_buf(),
