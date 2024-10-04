@@ -1,9 +1,9 @@
 use dotenv::dotenv;
 use std::error::Error;
+use std::fmt;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::fmt;
 use toml_edit::{value, DocumentMut, Item};
 
 #[derive(Debug)]
@@ -76,7 +76,6 @@ impl Config {
 
             doc["api"]["base"] = value("");
             doc["api"]["key"] = value("");
-
 
             // Write the document to the config file
             fs::write(&config_file, doc.to_string())?;
