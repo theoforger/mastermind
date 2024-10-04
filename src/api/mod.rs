@@ -3,6 +3,7 @@ mod models;
 
 // use std::env;
 use crate::config;
+use crate::config::Config;
 
 use config::ConfigError;
 
@@ -14,18 +15,15 @@ pub struct Instance {
 
 impl Instance {
     pub fn new() -> Result<Self, ConfigError> {
-        let config = config::Config::from_file("config.toml")?;
+        let config = Config::new()?;
         //dotenv().ok();
 
         //let base_url = Self::get_env_var("OPENAI_API_BASE_URL")?;
 
-        let base_url = match config.get_base_url() {
-            Some(url) => url.to_string(),
-            None => {
-                eprintln!("Base URL not found in configuration.");
-                return Err(ConfigError::ParseError("Base URL not found".to_string()));
-            }
-        };
+
+        let base_url = config.get_base_url()
+            .ok_or_else(|| ConfigError::ParseError("Base URL not found in config".to_string()))?
+            .to_string();
 
         let base_url = if !base_url.ends_with('/') {
             format!("{}/", base_url)
@@ -34,13 +32,9 @@ impl Instance {
         };
 
         // let key = Self::get_env_var("API_KEY")?;
-        let key = match config.get_api_key() {
-            Some(key) => key.to_string(),
-            None => {
-                eprintln!("API key not found in configuration.");
-                return Err(ConfigError::ParseError("API key not found".to_string()));
-            }
-        };
+        let key = config.get_api_key()
+            .ok_or_else(|| ConfigError::ParseError("API Key not found in config".to_string()))?
+            .to_string();
 
         Ok(Self {
             client: reqwest::Client::new(),
