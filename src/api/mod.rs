@@ -20,8 +20,8 @@ impl Instance {
 
         //let base_url = Self::get_env_var("OPENAI_API_BASE_URL")?;
 
-
-        let base_url = config.get_base_url()
+        let base_url = config
+            .get_base_url()
             .ok_or_else(|| ConfigError::ParseError("Base URL not found in config".to_string()))?
             .to_string();
 
@@ -32,7 +32,8 @@ impl Instance {
         };
 
         // let key = Self::get_env_var("API_KEY")?;
-        let key = config.get_api_key()
+        let key = config
+            .get_api_key()
             .ok_or_else(|| ConfigError::ParseError("API Key not found in config".to_string()))?
             .to_string();
 

@@ -1,10 +1,10 @@
+use dotenv::dotenv;
 use std::error::Error;
-use std::{env, fmt};
 use std::fs;
 use std::io;
-use dotenv::dotenv;
-use toml_edit::{value, Document};
 use std::path::{Path, PathBuf};
+use std::{env, fmt};
+use toml_edit::{value, Document};
 
 #[derive(Debug)]
 pub enum ConfigError {
@@ -47,7 +47,6 @@ impl From<toml_edit::TomlError> for ConfigError {
 }
 
 impl Config {
-
     pub fn new() -> Result<Self, ConfigError> {
         dotenv().ok();
 
@@ -63,7 +62,8 @@ impl Config {
             let mut doc = Document::new();
 
             // Set values from environment variables or use defaults
-            let base_url = env::var("OPENAI_API_BASE_URL").unwrap_or_else(|_| "https://api.groq.com/openai/v1/".to_string());
+            let base_url = env::var("OPENAI_API_BASE_URL")
+                .unwrap_or_else(|_| "https://api.groq.com/openai/v1/".to_string());
             doc["api"]["base"] = value(base_url);
 
             let api_key = env::var("API_KEY").unwrap_or_else(|_| "your-api-key".to_string());
@@ -79,12 +79,18 @@ impl Config {
             config_str.parse::<Document>()?
         };
 
-        Ok(Config { document, path: config_path })
+        Ok(Config {
+            document,
+            path: config_path,
+        })
     }
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ConfigError> {
         let config_str = fs::read_to_string(&path)?;
         let document = config_str.parse::<Document>()?;
-        Ok(Config { document, path: path.as_ref().to_path_buf() })
+        Ok(Config {
+            document,
+            path: path.as_ref().to_path_buf(),
+        })
     }
 
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), ConfigError> {
