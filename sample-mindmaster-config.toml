@@ -1,8 +1,0 @@
-# Instance of api that contains 3 environmental variables
-# api-key
-# baseURL
-# model
-[api]
-key = "your-api-key"
-base = "https://api.groq.com/openai/v1/"
-model = "llama-3.1-70b-versatile"
