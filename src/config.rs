@@ -61,7 +61,7 @@ impl Config {
         }
 
         // Define config file path
-        let config_file = master_mind_folder.join(".config.toml");
+        let config_file = master_mind_folder.join("config.toml");
 
         // Debug, left, in case you are having hard time finding a file
         // println!("config_file path is : {:?}", config_file);
