@@ -3,10 +3,12 @@ use std::fs;
 use std::path::PathBuf;
 
 pub mod api;
-pub mod clue;
-pub mod config;
+pub mod clues;
+pub mod configs;
+pub mod model_collection;
+
 mod json;
-pub mod model;
+
 #[cfg(test)]
 mod tests;
 

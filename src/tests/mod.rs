@@ -1,8 +1,9 @@
+use httpmock::prelude::*;
+
 use super::*;
 use crate::api::Instance;
-use crate::clue::ClueCollection;
-use crate::model::ModelCollection;
-use httpmock::prelude::*;
+use crate::clues::clue_collection::ClueCollection;
+use crate::model_collection::ModelCollection;
 
 #[test]
 fn test_api_instance() {
@@ -36,7 +37,7 @@ async fn test_get_models() {
     api_instance.set_base_url(server.url("/"));
 
     // Get response from mock server
-    let response = ModelCollection::new(api_instance.get_models().await.unwrap());
+    let response = ModelCollection::new(&api_instance.get_models().await.unwrap());
     mock.assert();
 
     // Compare outputs

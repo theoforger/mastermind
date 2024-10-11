@@ -1,8 +1,9 @@
-use super::Instance;
-use crate::json::chat_completions::ChatCompletionsResponse;
 use serde_json::json;
 
-const SYSTEM_PROMPT: &str = r#"
+use super::Instance;
+use crate::json::chat_completions::ChatCompletionsResponse;
+
+const SYSTEM_PROMPT: &str = "
 You are the spymaster in Codenames.
 I will give you a list of [agent word], followed by a list of [avoid word].
 Try to link [agent word] together.
@@ -17,7 +18,7 @@ Here are the requirements:
 - No explanations.
 - Give 5-10 [clue word].
 - Each [clue word] should link at least 2 [agent word].
-"#;
+";
 
 impl Instance {
     pub async fn post_chat_completions(
@@ -26,7 +27,7 @@ impl Instance {
         avoid_words: &[String],
         model_id: &String,
     ) -> Result<ChatCompletionsResponse, Box<dyn std::error::Error>> {
-        let request_body = self.build_request_body(link_words, avoid_words, model_id);
+        let request_body = Self::build_request_body(link_words, avoid_words, model_id);
 
         // Get response from API endpoint
         let response = self
@@ -36,18 +37,17 @@ impl Instance {
             .json(&request_body)
             .send()
             .await
-            .map_err(|e| format!("Failed to fetch clue collection from API server: {}", e))?;
+            .map_err(|e| format!("Failed to fetch clue collection from API server: {e}"))?;
 
         let parsed_response = response
             .json::<ChatCompletionsResponse>()
             .await
-            .map_err(|e| format!("Failed to parse clues from API server: {}", e))?;
+            .map_err(|e| format!("Failed to parse clues from API server: {e}"))?;
 
         Ok(parsed_response)
     }
 
     fn build_request_body(
-        &self,
         link_words: &[String],
         avoid_words: &[String],
         model_id: &String,

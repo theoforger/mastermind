@@ -1,61 +1,13 @@
-use crate::json::chat_completions::{ChatCompletionsResponse, Usage};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, ContentArrangement, Table};
 
-struct Clue {
-    clue_word: String,
-    count: usize,
-    linked_words: Vec<String>,
-    source: String,
-}
+use crate::clues::clue::Clue;
+use crate::json::chat_completions::{ChatCompletionsResponse, Usage};
 
 pub struct ClueCollection {
     clues: Vec<Clue>,
     usage: Usage,
-}
-
-impl Clue {
-    /// Create a new instance of `Clue` from a single line of clue out of the API response
-    pub fn new(clue_line: &str, source: String) -> Option<Self> {
-        let chunks: Vec<&str> = clue_line.split(", ").collect();
-
-        // Discard empty lines as well as clues with only one word linked
-        if chunks.len() < 4 {
-            return None;
-        }
-
-        let clue_word = chunks[0].trim().to_string();
-
-        let count = match chunks[1].parse::<usize>() {
-            Ok(count) => count,
-            Err(_) => return None,
-        };
-
-        let linked_words: Vec<String> = chunks[2..].iter().map(|&s| s.trim().to_string()).collect();
-
-        // Discard clue if count and the actual number don't line up
-        if linked_words.len() != count {
-            return None;
-        }
-
-        // Discard clues that contains special characters (likely due to hallucination)
-        if !clue_word.chars().all(|c| c.is_alphabetic() || c == ' ') {
-            return None;
-        }
-        for word in &linked_words {
-            if !word.chars().all(|c| c.is_alphabetic() || c == ' ') {
-                return None;
-            }
-        }
-
-        Some(Self {
-            clue_word,
-            count,
-            linked_words,
-            source,
-        })
-    }
 }
 
 impl ClueCollection {

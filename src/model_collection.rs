@@ -1,13 +1,14 @@
-use crate::json::models::ModelsResponse;
 use dialoguer::MultiSelect;
 use std::fmt::{Display, Formatter};
+
+use crate::json::models::ModelsResponse;
 
 pub struct ModelCollection {
     model_ids: Vec<String>,
 }
 
 impl ModelCollection {
-    pub fn new(response: ModelsResponse) -> Self {
+    pub fn new(response: &ModelsResponse) -> Self {
         let mut model_ids: Vec<String> = vec![];
         response
             .data
@@ -36,11 +37,9 @@ impl ModelCollection {
 
     pub fn validate_model_id(&self, model_id: &String) -> Result<(), Box<dyn std::error::Error>> {
         if !self.model_ids.contains(model_id) {
-            return Err(format!(
-                "{} is not a valid language model from your provider",
-                model_id
-            )
-            .into());
+            return Err(
+                format!("{model_id} is not a valid language model from your provider").into(),
+            );
         }
 
         Ok(())

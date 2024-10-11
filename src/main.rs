@@ -1,22 +1,21 @@
 use clap::Parser;
 use dotenv::dotenv;
-use mastermind::*;
 use std::env;
 use std::error::Error;
 
-use clue::ClueCollection;
-use mastermind::config::Config;
-use model::ModelCollection;
+use mastermind::{
+    api, clues, configs, model_collection, read_words_from_file, write_content_to_file, Args,
+};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    // Read arguments and environment variables
-    let args = Args::parse();
+use clues::clue_collection::ClueCollection;
+use configs::config::Config;
+use model_collection::ModelCollection;
 
+async fn run(args: &Args) -> Result<(), Box<dyn Error>> {
     // Create an API instance and get all available models from API
     let api_instance = api::Instance::new()?;
     let models_response = api_instance.get_models().await?;
-    let model_collection = ModelCollection::new(models_response);
+    let model_collection = ModelCollection::new(&models_response);
 
     // If -g is set, display models and exit the program
     if args.get {
@@ -25,14 +24,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Determine selected models
-    let selected_model_ids = select_models(&args, &model_collection)?;
+    let selected_model_ids = select_models(args, &model_collection)?;
 
     // Various API calls and then build ClueCollection
     let clue_collection =
-        obtain_clue_collection(&args, api_instance, model_collection, &selected_model_ids).await?;
+        obtain_clue_collection(args, api_instance, model_collection, &selected_model_ids).await?;
 
     // Output
-    handle_output(&args, clue_collection)?;
+    handle_output(args, &clue_collection)?;
 
     Ok(())
 }
@@ -89,7 +88,7 @@ async fn obtain_clue_collection(
     Ok(clue_collection)
 }
 
-fn handle_output(args: &Args, clue_collection: ClueCollection) -> Result<(), Box<dyn Error>> {
+fn handle_output(args: &Args, clue_collection: &ClueCollection) -> Result<(), Box<dyn Error>> {
     if clue_collection.is_empty() {
         println!("The language model didn't return any useful clues. Maybe try again?");
     } else if let Some(output_path) = &args.output {
@@ -103,5 +102,13 @@ fn handle_output(args: &Args, clue_collection: ClueCollection) -> Result<(), Box
     if args.token {
         clue_collection.display_token_info();
     }
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    let args = Args::parse();
+    run(&args).await?;
+
     Ok(())
 }

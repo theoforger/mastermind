@@ -9,12 +9,12 @@ impl Instance {
             .bearer_auth(&self.api_key)
             .send()
             .await
-            .map_err(|e| format!("Failed to fetch model IDs from API server: {}", e))?;
+            .map_err(|e| format!("Failed to fetch model IDs from API server: {e}"))?;
 
         let parsed_response = response
             .json::<ModelsResponse>()
             .await
-            .map_err(|e| format!("Failed to parse model IDs from API server: {}", e))?;
+            .map_err(|e| format!("Failed to parse model IDs from API server: {e}"))?;
 
         Ok(parsed_response)
     }
