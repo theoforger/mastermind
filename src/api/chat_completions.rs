@@ -32,7 +32,7 @@ impl Instance {
         let response = self
             .client
             .post(format!("{}chat/completions", self.base_url))
-            .bearer_auth(&self.key)
+            .bearer_auth(&self.api_key)
             .json(&request_body)
             .send()
             .await

@@ -3,7 +3,7 @@ use std::error::Error;
 use std::fmt;
 use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use toml_edit::{value, DocumentMut, Item};
 
 #[derive(Debug)]
@@ -14,8 +14,7 @@ pub enum ConfigError {
 }
 
 pub struct Config {
-    pub document: DocumentMut,
-    pub path: PathBuf,
+    document: DocumentMut,
 }
 
 impl fmt::Display for ConfigError {
@@ -51,20 +50,31 @@ impl Config {
         dotenv().ok();
 
         // Get the user's home directory
-        let config_dir = dirs::config_dir().unwrap().to_path_buf();
+        let config_dir = match dirs::config_dir() {
+            Some(dir) => dir.to_path_buf(),
+            None => {
+                return Err(ConfigError::FileNotFound(
+                    "No config directory found".to_string(),
+                ))
+            }
+        };
 
         // Define the config folder
-        let master_mind_folder = config_dir.join("mastermind");
-        match fs::create_dir_all(&master_mind_folder) {
-            Ok(_) => println!("Folder created successfully at {:?}", master_mind_folder),
-            Err(e) => eprintln!("Failed to create folder: {}", e),
+        let mastermind_dir = config_dir.join("mastermind");
+        if !mastermind_dir.exists() {
+            match fs::create_dir_all(&mastermind_dir) {
+                Ok(_) => println!("Directory created successfully at {:?}", mastermind_dir),
+                Err(e) => {
+                    return Err(ConfigError::FileNotFound(format!(
+                        "Failed to create folder: {}",
+                        e
+                    )))
+                }
+            }
         }
 
         // Define config file path
-        let config_file = master_mind_folder.join("config.toml");
-
-        // Debug, left, in case you are having hard time finding a file
-        // println!("config_file path is : {:?}", config_file);
+        let config_file = mastermind_dir.join("config.toml");
 
         // If the file doesn't exist
         let document = if !config_file.exists() {
@@ -73,9 +83,11 @@ impl Config {
 
             // Make .toml file in table-like format
             doc["api"] = Item::Table(Default::default());
-
-            doc["api"]["base"] = value("");
+            doc["api"]["base-url"] = value("");
             doc["api"]["key"] = value("");
+
+            doc["model"] = Item::Table(Default::default());
+            doc["model"]["default"] = value("");
 
             // Write the document to the config file
             fs::write(&config_file, doc.to_string())?;
@@ -87,18 +99,7 @@ impl Config {
             config_str.parse::<DocumentMut>()?
         };
 
-        Ok(Config {
-            document,
-            path: config_file,
-        })
-    }
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ConfigError> {
-        let config_str = fs::read_to_string(&path)?;
-        let document = config_str.parse::<DocumentMut>()?;
-        Ok(Config {
-            document,
-            path: path.as_ref().to_path_buf(),
-        })
+        Ok(Config { document })
     }
 
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), ConfigError> {
@@ -107,18 +108,20 @@ impl Config {
     }
 
     pub fn get_base_url(&self) -> Option<&str> {
-        self.document["api"]["base"].as_str()
-    }
-
-    pub fn set_base_url(&mut self, new_url: &str) {
-        self.document["api"]["base"] = value(new_url);
+        self.document["api"]["base-url"]
+            .as_str()
+            .filter(|s| !s.is_empty())
     }
 
     pub fn get_api_key(&self) -> Option<&str> {
-        self.document["api"]["key"].as_str()
+        self.document["api"]["key"]
+            .as_str()
+            .filter(|s| !s.is_empty())
     }
 
-    pub fn set_api_key(&mut self, new_key: &str) {
-        self.document["api"]["key"] = value(new_key);
+    pub fn get_default_model(&self) -> Option<&str> {
+        self.document["model"]["default"]
+            .as_str()
+            .filter(|s| !s.is_empty())
     }
 }

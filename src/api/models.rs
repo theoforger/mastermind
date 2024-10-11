@@ -6,7 +6,7 @@ impl Instance {
         let response = self
             .client
             .get(format!("{}models", self.base_url))
-            .bearer_auth(&self.key)
+            .bearer_auth(&self.api_key)
             .send()
             .await
             .map_err(|e| format!("Failed to fetch model IDs from API server: {}", e))?;

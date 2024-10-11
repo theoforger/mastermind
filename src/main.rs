@@ -1,18 +1,17 @@
 use clap::Parser;
 use dotenv::dotenv;
+use mastermind::*;
 use std::env;
 use std::error::Error;
 
-use mastermind::*;
-
 use clue::ClueCollection;
+use mastermind::config::Config;
 use model::ModelCollection;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Read arguments and environment variables
     let args = Args::parse();
-    dotenv().ok();
 
     // Create an API instance and get all available models from API
     let api_instance = api::Instance::new()?;
@@ -40,22 +39,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 /// If -m is present and has values, use the preferred language models.
 /// If -m is present but doesn't have a value, prompt selection menu.
-/// If -m is not present, use the default from environment variable.
+/// If -m is not present, use the default from config file and then environment variable.
 fn select_models(
     args: &Args,
     model_collection: &ModelCollection,
 ) -> Result<Vec<String>, Box<dyn Error>> {
     let selected_model_ids = match &args.models {
-        Some(model_ids) => {
-            if model_ids[0] == "interactive" {
-                model_collection.prompt_selection()
+        Some(model_ids) if model_ids[0] == "interactive" => model_collection.prompt_selection(),
+        Some(model_ids) => model_ids.to_owned(),
+        None => {
+            dotenv().ok();
+            if let Ok(envvar) = env::var("DEFAULT_MODEL_ID") {
+                vec![envvar]
+            } else if let Some(config) = Config::new()?.get_default_model() {
+                vec![config.to_string()]
             } else {
-                model_ids.to_owned()
+                return Err("No default model found".into());
             }
         }
-        None => vec![env::var("DEFAULT_MODEL_ID")
-            .map_err(|_| "Cannot read environment variable: DEFAULT_MODEL_ID")?],
     };
+
     Ok(selected_model_ids)
 }
 
