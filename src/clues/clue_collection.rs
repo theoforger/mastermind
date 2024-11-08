@@ -123,3 +123,42 @@ impl ClueCollection {
         list
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::api::Instance;
+    use httpmock::prelude::*;
+    use std::fs;
+    #[tokio::test]
+    async fn test_new() {
+        // Start a lightweight mock server.
+        let server = MockServer::start_async().await;
+
+        // Create a mock on the server.
+        let mock = server.mock(|when, then| {
+            when.method(POST).path("/chat/completions");
+            then.status(200)
+                .header("content-type", "application/json")
+                .body_from_file("resources/tests/mock_responses/chat_completions.json");
+        });
+
+        // Create an API instance and set the base url to mock server url
+        let mut api_instance = Instance::new().unwrap();
+        api_instance.set_base_url(server.url("/"));
+
+        // Get responses from mock server
+        let responses = vec![api_instance
+            .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new(), &String::new())
+            .await
+            .unwrap()];
+        mock.assert();
+
+        // Compare outputs
+        let output = ClueCollection::new(responses).generate_list();
+        let expected_output =
+            fs::read_to_string("resources/tests/expected_outputs/chat_completions.txt").unwrap();
+        assert_eq!(output, expected_output);
+    }
+}

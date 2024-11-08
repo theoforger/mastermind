@@ -74,3 +74,34 @@ impl Instance {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    #[tokio::test]
+    async fn test_post_chat_completions() {
+        // Start a lightweight mock server.
+        let server = MockServer::start_async().await;
+
+        // Create a mock on the server.
+        let mock = server.mock(|when, then| {
+            when.method(POST).path("/chat/completions");
+            then.status(200)
+                .header("content-type", "application/json")
+                .body_from_file("resources/tests/mock_responses/chat_completions.json");
+        });
+
+        // Create an API instance and set the base url to mock server url
+        let mut api_instance = Instance::new().unwrap();
+        api_instance.set_base_url(server.url("/"));
+
+        // Get responses from mock server
+        api_instance
+            .post_chat_completions(&Vec::<String>::new(), &Vec::<String>::new(), &String::new())
+            .await
+            .unwrap();
+        mock.assert();
+    }
+}

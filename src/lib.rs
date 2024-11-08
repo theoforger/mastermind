@@ -9,9 +9,6 @@ pub mod model_collection;
 
 mod json;
 
-#[cfg(test)]
-mod tests;
-
 /// Mastermind - An LLM-powered CLI tool to help you be a better spymaster in Codenames
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -72,4 +69,38 @@ pub fn write_content_to_file(
         .map_err(|_| format!("Failed to write to file: {}", path.to_string_lossy()))?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_read_words_from_file() {
+        let to_link = read_words_from_file(&PathBuf::from("examples/link.txt"));
+        assert!(to_link.is_ok());
+        let to_avoid = read_words_from_file(&PathBuf::from("examples/avoid.txt"));
+        assert!(to_avoid.is_ok());
+    }
+
+    #[test]
+    fn test_write_content_to_file() {
+        // Invalid path
+        let write_result = write_content_to_file(
+            &PathBuf::from("/none/existent/path/lol"),
+            String::from("useless text"),
+        );
+        assert!(write_result.is_err());
+
+        // Successful write
+        let temp_dir = tempdir().unwrap();
+        let temp_file = temp_dir.path().join("temp.txt");
+        write_content_to_file(&temp_file, String::from("some text")).unwrap();
+        assert_eq!(fs::read_to_string(&temp_file).unwrap(), "some text");
+
+        // Non-empty file
+        let write_result = write_content_to_file(&temp_file, String::from("some text again"));
+        assert!(write_result.is_err());
+    }
 }

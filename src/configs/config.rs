@@ -83,3 +83,37 @@ impl Config {
             .filter(|s| !s.is_empty())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[tokio::test]
+    async fn test_new() {
+        // Create a temporary directory
+        let temp_dir = tempdir().unwrap();
+        let config_dir = temp_dir.path().join("mastermind");
+        assert!(!config_dir.exists());
+
+        // Override config home
+        std::env::set_var("XDG_CONFIG_HOME", temp_dir.path().to_str().unwrap());
+
+        // Create a config
+        let config_result = Config::new();
+        assert!(config_result.is_ok());
+        assert!(config_dir.exists());
+
+        // Check if config.toml exists
+        let config_file = config_dir.join("config.toml");
+        assert!(config_file.exists());
+
+        // Check the content
+        let content = fs::read_to_string(config_file).unwrap();
+        assert!(content.contains("[api]"));
+        assert!(content.contains("base-url"));
+        assert!(content.contains("key"));
+        assert!(content.contains("[model]"));
+        assert!(content.contains("default"));
+    }
+}

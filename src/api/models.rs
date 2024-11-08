@@ -19,3 +19,31 @@ impl Instance {
         Ok(parsed_response)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    #[tokio::test]
+    async fn test_get_models() {
+        // Start a lightweight mock server.
+        let server = MockServer::start_async().await;
+
+        // Create a mock on the server.
+        let mock = server.mock(|when, then| {
+            when.method(GET).path("/models");
+            then.status(200)
+                .header("content-type", "application/json")
+                .body_from_file("resources/tests/mock_responses/models.json");
+        });
+
+        // Create an API instance and set the base url to mock server url
+        let mut api_instance = Instance::new().unwrap();
+        api_instance.set_base_url(server.url("/"));
+
+        // Get response from mock server
+        api_instance.get_models().await.unwrap();
+        mock.assert();
+    }
+}

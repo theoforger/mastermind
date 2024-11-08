@@ -60,3 +60,14 @@ impl Instance {
         self.base_url = base_url;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let api_instance = Instance::new();
+        assert!(api_instance.is_ok());
+    }
+}
