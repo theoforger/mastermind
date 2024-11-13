@@ -45,9 +45,9 @@ impl Instance {
                     Ok(config_key.to_string())
                 } else {
                     Err(format!(
-                        "Could not find environment variable '{envvar}' or any related configuration"
+                        "Could not find environment variable '{envvar}' or any related configuration\nPlease check you config file"
                     )
-                    .into())
+                        .into())
                 }
             }
         }
@@ -62,12 +62,34 @@ impl Instance {
 }
 
 #[cfg(test)]
+impl Default for Instance {
+    fn default() -> Self {
+        Self {
+            client: reqwest::Client::new(),
+            base_url: "".to_string(),
+            api_key: "".to_string(),
+        }
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_new() {
-        let api_instance = Instance::new();
-        assert!(api_instance.is_ok());
+        env::set_var("OPENAI_API_BASE_URL", "abc");
+        env::set_var("API_KEY", "def");
+
+        let api_instance = Instance::new().unwrap();
+        assert_eq!(api_instance.base_url, "abc/");
+        assert_eq!(api_instance.api_key, "def");
+    }
+
+    #[test]
+    fn test_default() {
+        let api_instance = Instance::default();
+        assert_eq!(api_instance.base_url, "");
+        assert_eq!(api_instance.api_key, "");
     }
 }

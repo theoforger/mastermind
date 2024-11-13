@@ -24,7 +24,7 @@ impl Config {
         let mastermind_dir = config_dir.join("mastermind");
         if !mastermind_dir.exists() {
             match fs::create_dir_all(&mastermind_dir) {
-                Ok(()) => println!("Directory created successfully at {mastermind_dir:?}"),
+                Ok(()) => println!("Config directory created at {mastermind_dir:?}"),
                 Err(e) => {
                     return Err(ConfigError::FileNotFound(format!(
                         "Failed to create folder: {e}"
@@ -51,6 +51,7 @@ impl Config {
                 doc["model"]["default"] = value("");
 
                 // Write the document to the config file
+                println!("Config file not found or empty. Creating one...");
                 fs::write(&config_file, doc.to_string())?;
 
                 doc

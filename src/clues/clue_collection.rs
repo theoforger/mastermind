@@ -145,7 +145,7 @@ mod tests {
         });
 
         // Create an API instance and set the base url to mock server url
-        let mut api_instance = Instance::new().unwrap();
+        let mut api_instance = Instance::new().unwrap_or_default();
         api_instance.set_base_url(server.url("/"));
 
         // Get responses from mock server

@@ -8,9 +8,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  API_KEY: ""
-  OPENAI_API_BASE_URL: ""
-  DEFAULT_MODEL_ID: ""
 
 jobs:
   lint:
