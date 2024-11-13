@@ -77,10 +77,10 @@ impl Instance {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
     use super::*;
-    use httpmock::prelude::*;
     use crate::read_words_from_file;
+    use httpmock::prelude::*;
+    use std::path::PathBuf;
 
     #[tokio::test]
     async fn test_post_chat_completions() {
