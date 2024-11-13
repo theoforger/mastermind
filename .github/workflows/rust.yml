@@ -13,19 +13,23 @@ env:
   DEFAULT_MODEL_ID: ""
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Test -V
-      run: cargo run -- -V
-    - name: Test -h
-      run: cargo run -- -h
-    - name: Run unit testing
-      run: cargo test
-    - name: Run linting test
+    - name: Run rustfmt
       run: cargo fmt --check
+    - name: Run clippy
+      run: cargo clippy --all-features --all-targets -- -D clippy::all
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run unit testing
+        run: cargo test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo build --verbose
