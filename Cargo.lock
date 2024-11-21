@@ -1177,8 +1177,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "mastermind"
-version = "1.0.0"
+name = "mastermind-cli"
+version = "1.0.1"
 dependencies = [
  "clap",
  "comfy-table",

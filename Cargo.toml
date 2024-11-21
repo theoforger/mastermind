@@ -1,6 +1,6 @@
 [package]
-name = "mastermind"
-version = "1.0.0"
+name = "mastermind-cli"
+version = "1.0.1"
 edition = "2021"
 authors = ["theoforger <theoforger@proton.me>"]
 license-file = "LICENSE"

@@ -3,7 +3,7 @@ use dotenv::dotenv;
 use std::env;
 use std::error::Error;
 
-use mastermind::{
+use mastermind_cli::{
     api, clues, configs, model_collection, read_words_from_file, write_content_to_file, Args,
 };
 
