@@ -39,6 +39,13 @@ cargo build
 
 See: https://github.com/theoforger/mastermind?tab=readme-ov-file#%EF%B8%8F-configure
 
+Alternatively, you can make use of the `.env` file. Simply make a copy of example.env and name it .env
+
+```bash
+cp example.env .env
+```
+
+Then edit .env and provide you preferred configuration.
 
 ## ✒️ Linting / Code Formatting
 Before you commit, make sure the following linting/formatting tools using the options below. Commit only when your code is error/warning free.

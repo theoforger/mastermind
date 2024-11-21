@@ -34,15 +34,11 @@ During the first run, a config file will be created at your system's preferred l
 - For Windows: `C:\Users\[your username]\AppData\Roaming\mastermind\config.toml`
 
 ### Environment Variables
-Make a copy of [`example.env`](example.env) and name it `.env`
 
-```bash
-cp example.env .env
-```
-
-Then edit `.env` and provide you preferred configuration.
-
-Alternatively, you can simply pass these environment variables during run time.
+Simply pass these environment variables during run time:
+- `API_KEY`
+- `OPENAI_API_BASE_URL`
+- `DEFAULT_MODEL_ID`
 
 
 ## 🏃 Run
