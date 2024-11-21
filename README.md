@@ -9,8 +9,7 @@ Written in Rust 🦀, because why not?
 
 <img src="images/demo.gif" alt="A gif demo of the basic functions of this program."/>
 
-## 💻 Usage
-
+## 📖 Prepare
 To get started, prepare two text files:
 
 1. **Words to Link Together** - Contains the words from your own team.
@@ -21,7 +20,28 @@ To get started, prepare two text files:
 
 One word per line. Refer to the [`examples`](examples) directory for sample files.
 
-Run the tool with:
+## 🛠️ Configure
+Here are what you need to configure before running mastermind:
+- API key
+- The base URL of an OpenAI-compatible API
+- A default language model
+
+There are two ways to configure this program:
+### Config File
+During the first run, a config file will be created at your system's preferred location. The specific location will be given in the output. Generally, it is located at:
+- For Linux: `$HOME/.config/mastermind/config.toml`
+- For macOS: `$HOME/Library/Application Support/mastermind/config.toml`
+- For Windows: `C:\Users\[your username]\AppData\Roaming\mastermind\config.toml`
+
+### Environment Variables
+
+Simply pass these environment variables during run time:
+- `API_KEY`
+- `OPENAI_API_BASE_URL`
+- `DEFAULT_MODEL_ID`
+
+
+## 🏃 Run
 
 ```bash
 mastermind [TO_LINK] [TO_AVOID]

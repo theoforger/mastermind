@@ -51,7 +51,13 @@ impl Config {
                 doc["model"]["default"] = value("");
 
                 // Write the document to the config file
-                println!("Config file not found or empty. Creating one...");
+                println!(
+                    "Looks like it's your first run\n\
+                          Creating a config file at {}\n\
+                          Make sure to modify it first or use the proper environment variables\n\
+                          See: https://github.com/theoforger/mastermind?tab=readme-ov-file#%EF%B8%8F-configure",
+                    config_file.display()
+                );
                 fs::write(&config_file, doc.to_string())?;
 
                 doc

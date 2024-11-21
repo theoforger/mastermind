@@ -27,19 +27,6 @@ git clone https://github.com/theoforger/mastermind.git
 cd mastermind
 ```
 
-### Configure Environment Variables
-
-Make a copy of [`example.env`](example.env) and name it `.env`
-
-```bash
-cp example.env .env
-```
-
-Edit `.env` to add or modify:
-- API key
-- The base URL of an OpenAI-compatible API
-- A default language model
-
 ### Build the Project
 
 Run the following command:
@@ -48,6 +35,17 @@ Run the following command:
 cargo build
 ```
 
+### Configure Environment Variables
+
+See: https://github.com/theoforger/mastermind?tab=readme-ov-file#%EF%B8%8F-configure
+
+Alternatively, you can make use of the `.env` file. Simply make a copy of example.env and name it .env
+
+```bash
+cp example.env .env
+```
+
+Then edit .env and provide you preferred configuration.
 
 ## ✒️ Linting / Code Formatting
 Before you commit, make sure the following linting/formatting tools using the options below. Commit only when your code is error/warning free.
@@ -59,7 +57,7 @@ cargo fmt
 ```
 
 ### Clippy
-If you don't have `clippy` installed already. Add it through `rustup`:
+If you don't have `clippy` installed already (which is very unlikely). Add it through `rustup`:
 ```bash
 rustup component add clippy
 ```
