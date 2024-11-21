@@ -27,19 +27,6 @@ git clone https://github.com/theoforger/mastermind.git
 cd mastermind
 ```
 
-### Configure Environment Variables
-
-Make a copy of [`example.env`](example.env) and name it `.env`
-
-```bash
-cp example.env .env
-```
-
-Edit `.env` to add or modify:
-- API key
-- The base URL of an OpenAI-compatible API
-- A default language model
-
 ### Build the Project
 
 Run the following command:
@@ -47,6 +34,10 @@ Run the following command:
 ```bash
 cargo build
 ```
+
+### Configure Environment Variables
+
+See: https://github.com/theoforger/mastermind?tab=readme-ov-file#%EF%B8%8F-configure
 
 
 ## ✒️ Linting / Code Formatting
