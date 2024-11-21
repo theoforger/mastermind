@@ -57,7 +57,7 @@ cargo fmt
 ```
 
 ### Clippy
-If you don't have `clippy` installed already. Add it through `rustup`:
+If you don't have `clippy` installed already (which is very unlikely). Add it through `rustup`:
 ```bash
 rustup component add clippy
 ```
