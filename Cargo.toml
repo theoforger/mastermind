@@ -1,9 +1,9 @@
 [package]
 name = "mastermind-cli"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 authors = ["theoforger <theoforger@proton.me>"]
-license-file = "LICENSE"
+license = "GPL-3"
 description = "An LLM-powered CLI tool to help you be a better spymaster in Codenames"
 repository = "https://github.com/theoforger/mastermind"
 readme = "README.md"
